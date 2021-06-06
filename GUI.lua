@@ -73,3 +73,6 @@ function GUI.drawFrame()
 	term.setCursor(x/10+1, y/10*2-1)
 	GUI.bar(0x5A5A5A, x/10, y/10*2-1, x/10*8, 1)
 	term.write("Heat Level")
+end
+
+return GUI

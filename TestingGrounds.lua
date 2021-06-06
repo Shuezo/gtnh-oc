@@ -88,9 +88,6 @@ print(Functions.energyUsage())
 
 
 
-
-
---[[
 function GUI.bar(color1, posX, posY, sizeW, sizeH)
 	gpu.setBackground(color1)
 	gpu.fill(posX, posY, sizeW, sizeH, " ")
@@ -147,4 +144,3 @@ function GUI.drawBars()
 	gpu.setForeground(0xF0F0F0)
 	gpu.setBackground(0x5A5A5A)
 end --end drawBars
---]]
