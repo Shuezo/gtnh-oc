@@ -1,4 +1,9 @@
-
+--[[
+Date: 2021/06/05 
+Author: A. Jones & S. Huezo
+Version: 1.0
+Usage: To be used in conjunction with Monitor.lua
+]]--
 -------------------------------------------Variables-------------------------------------------
 local Power = {}
 
@@ -62,3 +67,5 @@ end
 function Power.checkBatteryPercent()
     return string.format("%.2f %%", Power.checkBatteryLevel() * 100)
 end
+
+return Power
