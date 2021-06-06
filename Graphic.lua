@@ -13,8 +13,15 @@ local Power = require("Power")
 
 local gpu = component.gpu
 local x, y = 0, 0
+
 local white = 0xFFFFFF --Main Color
 local black = 0x000000 --Accessory Color
+
+local powerBarX
+local powerBarY
+local powerBarWidth
+local powerBarHeight
+local powerBarColor = 0xFFFFFF
 
 ------------Functions------------
 
@@ -76,7 +83,7 @@ function Graphic.drawLabel()
 		y=y+1
 	gpu.set(x,y,"Remaining")
 		y=y+1
-	Graphic.drawFrame(white, black, x-4, y, x+32, y+2)
+	Graphic.drawPowerBar(white, black, x-4, y, x+34, y+3)
 end --end drawLabel
 
 function Graphic.drawData()
@@ -109,6 +116,8 @@ function Graphic.drawData()
 		y=y+1
 	gpu.set(x,y,rem)
 		y=y+1
+	
+	Graphic.updatePowerBar()
 end --end drawData
 
 function Graphic.drawFrame(color, fill, x1, y1, x2, y2)
@@ -119,15 +128,39 @@ function Graphic.drawFrame(color, fill, x1, y1, x2, y2)
 	gpu.fill(x1, y1, width, height, " ")
 	
 	gpu.setBackground(fill)
-	if not ((x1 == x2    or
-	         x1 == x2-1  or
-			 x1 == x2+1) and
-			(y1 == y2    or
-			 y1 == y2-1  or
-	         y1 == y2-2 )) 
-	then
-		gpu.fill(x1+1, y1+1, width-1, height-1, " ")
+
+	if width > 2 or height > 2 then
+		gpu.fill(x1+1, y1+1, width-2, height-2, " ")
 	end
 end --end drawFrame
+
+function Graphic.drawPowerBar(color, fill, x1, y1, x2, y2)
+	Graphic.drawFrame(color, fill, x1, y1, x2, y2)
+	
+	powerBarX = x1+1
+	powerBarY = y1+1
+	powerBarWidth  = x2 - x1 - 2
+	powerBarHeight = y2 - y1 - 2
+
+	Graphic.updatePowerBar(color)
+end
+
+function Graphic.updatePowerBar()
+	local powerLevel = Power.checkBatteryLevel()
+	local fillWidth = math.floor(powerBarWidth * powerLevel)
+	local emptyWidth = powerBarWidth - fillWidth - 1
+
+	if fillWidth > 0 then
+		gpu.setBackground(powerBarColor)
+		gpu.fill(powerBarX, powerBarY, fillWidth, powerBarHeight, " ")
+	end
+
+	if emptyWidth > 0 then
+		gpu.setBackground(black)
+		gpu.fill(powerBarX + fillWidth + 1, powerBarY, emptyWidth, powerBarHeight, " ")
+	end
+
+	gpu.setBackground(black)
+end
 
 return Graphic
