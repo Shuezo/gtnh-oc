@@ -9,38 +9,14 @@ local Graphic = {}
 
 local component = require("component")
 local term = require("term")
+local Power = require("Power")
 
 local gpu = component.gpu
 local x, y = 0, 0
-local color1 = 0x99B2F2 --Main Color
-local color2 = 0x5A5A5A --Accessory Color
-local black = 0
-
---[[local colors = {
-	white = 0xF0F0F0,
-	orange = 0xF2B233,
-	magenta = 0xE57FD8,
-	lightBlue = 0x99B2F2,
-	yellow = 0xDEDE6C,
-	lime = 0x7FCC19,
-	pink = 0xF2B2CC,
-	gray = 0x4C4C4C,
-	lightGray = 0x999999,
-	cyan = 0x4C99B2,
-	purple = 0xB266E5,
-	blue = 0x3366CC,
-	brown = 0x7F664C,
-	green = 0x57A64E,
-	red = 0xCC4C4C,
-	black = 0,
-} ]]--This is just for reference
+local white = 0xFFFFFF --Main Color
+local black = 0x000000 --Accessory Color
 
 ------------Functions------------
-
-function Graphic.test()
-	local a = 'Success!' 
-	return a
-end
 
 function Graphic.clearScreen()
 	local w, h = gpu.getResolution()
@@ -54,30 +30,104 @@ function Graphic.setupResolution()
 	local w, h = gpu.getResolution()
 	if (w ~= maxW) and (h ~= maxH) then
 		gpu.setResolution(maxW, maxH)
-		x, y = gpu.getResolution()
+		local x, y = gpu.getResolution()
 		return true
 	elseif (w == maxW and h == maxH) then
-		x, y = gpu.getResolution()
+		local x, y = gpu.getResolution()
 		return true
 	else
 		return false
 	end
-end --setupResolution
-
-function Graphic.bar(color1, posX, posY, sizeW, sizeH)
-	gpu.setBackground(color1)
-	gpu.fill(posX, posY, sizeW, sizeH, " ")
-end --end bar
+end --end setupResolution
 
 function Graphic.drawFrame()
-    --GUI.bar(color2, x/10, y/20*6-1, 50, 9)
+	gpu.setForeground(black)
+	gpu.setBackground(white)
+	gpu.fill(1, 1, 50, 1, " ") --top
+	gpu.fill(1, 16, 50, 1, " ")  --bottom
+	gpu.fill(1, 2, 2, 14, " ")  --left
+	gpu.fill(49, 2, 2, 14, " ")  --right
 
-    term.setCursor(x/10+1, y/10-1)
-	--GUI.bar(0x5A5A5A, x/10, y/10-1, x/10*8, 1)
-	term.write("Power Level")
-	term.setCursor(x/10+1, y/10*2-1)
-	--GUI.bar(0x5A5A5A, x/10, y/10*2-1, x/10*8, 1)
-	term.write("Heat Level")
-end
+	gpu.setForground(white)
+	gpu.setBackground(black)
+	gpu.fill(3, 2, 46, 14, " ") --center, black
+end --end charFrame
+
+function Graphic.drawLabel()
+	local w, h = gpu.getResolution()
+	local x = 10
+	local y = 4
+	gpu.set(1,1,"------------ Power Monitoring  System ------------")
+	gpu.set(x,y,"Status")
+		y=y+1
+	gpu.set(x-4,y,"--------------------------------------")
+		y=y+1
+	gpu.set(x,y,"Output")
+		y=y+1
+	gpu.set(x,y,"Heat")
+		y=y+1
+	gpu.set(x-4,y,"--------------------------------------")
+		y=y+1
+	gpu.set(x,y,"Battery")
+		y=y+1
+	gpu.set(x,y,"Usage")
+		y=y+1
+	gpu.set(x-4,y,"--------------------------------------")
+		y=y+1
+	gpu.set(x,y,"Remaining")
+		y=y+1
+	Graphic.drawFrame(white, black, x-4, y, x+32, y+2)
+end --end drawLabel
+
+function Graphic.drawData()
+	local energy = Power.energyUsage()
+	local rem = Power.timeRemaining()
+	local status = Power.checkStatus()
+	local output = Power.checkEnergy()
+	local heat = Power.checkHeatPercent()
+	local bat = Power.checkBatteryPercent()
+
+	local w, h = gpu.getResolution()
+	local x = w-25
+	local y = 4
+	
+	if status == true then gpu.set(x,y,"ON    ") else gpu.set(x,y,"OFF    ") end
+		y=y+1
+	--Adding a space
+		y=y+1
+	gpu.set(x,y, string.format("%.0f EU/t    ", output))
+		y=y+1
+	gpu.set(x,y,heat)
+		y=y+1
+	--Adding a space
+		y=y+1
+	gpu.set(x,y,bat)
+		y=y+1
+	if energy > 0 then gpu.set(x,y,string.format("+%.0f EU/t    ", energy)) else gpu.set(x,y,string.format("%.0f EU/t    ", energy)) end
+		y=y+1
+	--Adding a space
+		y=y+1
+	gpu.set(x,y,rem)
+		y=y+1
+end --end drawData
+
+function Graphic.drawFrame(color, fill, x1, y1, x2, y2)
+	local width  = x2 - x1
+	local height = y2 - y1
+
+	gpu.setBackground(color)
+	gpu.fill(x1, y1, width, height, " ")
+	
+	gpu.setBackground(fill)
+	if not ((x1 == x2    or
+	         x1 == x2-1  or
+			 x1 == x2+1) and
+			(y1 == y2    or
+			 y1 == y2-1  or
+	         y1 == y2-2 )) 
+	then
+		gpu.fill(x1+1, y1+1, width-1, height-1, " ")
+	end
+end --end drawFrame
 
 return Graphic
