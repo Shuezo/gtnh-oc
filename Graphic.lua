@@ -4,15 +4,14 @@ Author: A. Jones & S. Huezo
 Version: 0.1
 Usage: To be used in conjunction with Monitor.lua
 ]]--
--------------------------------------------Variables-------------------------------------------
-local GUI = {}
+------------Variables------------
+local Graphic = {}
 
 local component = require("component")
 local term = require("term")
 
 local gpu = component.gpu
 local x, y = 0, 0
-local x, y = gpu.getResolution()
 local color1 = 0x99B2F2 --Main Color
 local color2 = 0x5A5A5A --Accessory Color
 local black = 0
@@ -36,13 +35,19 @@ local black = 0
 	black = 0,
 } ]]--This is just for reference
 
--------------------------------------------Functions-------------------------------------------
+------------Functions------------
 
-function Clear()
-    gpu.fill(1, 1, x, y, " ")
+function Graphic.test()
+	local a = 'Success!' 
+	return a
+end
+
+function Graphic.clearScreen()
+	local w, h = gpu.getResolution()
+	gpu.fill(1, 1, w, h, " ")
 end --clears the screen
 
-function GUI.setupResolution()
+function Graphic.setupResolution()
 	--Use the resolution to help position all of the UI elements
 	--Also sets the resolution to the maximum that is possible
 	local maxW, maxH = gpu.maxResolution()
@@ -59,20 +64,20 @@ function GUI.setupResolution()
 	end
 end --setupResolution
 
-function GUI.bar(color1, posX, posY, sizeW, sizeH)
+function Graphic.bar(color1, posX, posY, sizeW, sizeH)
 	gpu.setBackground(color1)
 	gpu.fill(posX, posY, sizeW, sizeH, " ")
 end --end bar
 
-function GUI.drawFrame()
-    GUI.bar(color2, x/10, y/20*6-1, 50, 9)
+function Graphic.drawFrame()
+    --GUI.bar(color2, x/10, y/20*6-1, 50, 9)
 
     term.setCursor(x/10+1, y/10-1)
-	GUI.bar(0x5A5A5A, x/10, y/10-1, x/10*8, 1)
+	--GUI.bar(0x5A5A5A, x/10, y/10-1, x/10*8, 1)
 	term.write("Power Level")
 	term.setCursor(x/10+1, y/10*2-1)
-	GUI.bar(0x5A5A5A, x/10, y/10*2-1, x/10*8, 1)
+	--GUI.bar(0x5A5A5A, x/10, y/10*2-1, x/10*8, 1)
 	term.write("Heat Level")
 end
 
-return GUI
+return Graphic
