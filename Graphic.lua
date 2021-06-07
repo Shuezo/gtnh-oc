@@ -83,7 +83,7 @@ function Graphic.drawLabel()
 		y=y+1
 	gpu.set(x,y,"Remaining")
 		y=y+1
-	Graphic.drawPowerBar(white, black, x-4, y, x+34, y+3)
+	Graphic.drawPowerBar(white, black, x-4, y, x+34, y+3) --to be updated later
 end --end drawLabel
 
 function Graphic.drawData()
@@ -120,7 +120,7 @@ function Graphic.drawData()
 	Graphic.updatePowerBar()
 end --end drawData
 
-function Graphic.drawFrame(color, fill, x1, y1, x2, y2)
+function Graphic.drawBox(color, fill, x1, y1, x2, y2)
 	local width  = x2 - x1
 	local height = y2 - y1
 
@@ -135,7 +135,7 @@ function Graphic.drawFrame(color, fill, x1, y1, x2, y2)
 end --end drawFrame
 
 function Graphic.drawPowerBar(color, fill, x1, y1, x2, y2)
-	Graphic.drawFrame(color, fill, x1, y1, x2, y2)
+	--Graphic.drawBox(color, fill, x1, y1, x2, y2) --to be updated later
 	
 	powerBarX = x1+1
 	powerBarY = y1+1
@@ -150,14 +150,22 @@ function Graphic.updatePowerBar()
 	local fillWidth = math.floor(powerBarWidth * powerLevel)
 	local emptyWidth = powerBarWidth - fillWidth - 1
 
+	local pos
 	if fillWidth > 0 then
-		gpu.setBackground(powerBarColor)
-		gpu.fill(powerBarX, powerBarY, fillWidth, powerBarHeight, " ")
+		-- gpu.setBackground(powerBarColor)
+		-- gpu.fill(powerBarX, powerBarY, fillWidth, powerBarHeight, " ")
+
+		for pos=powerBarX,powerBarX+fillWidth do
+			gpu.set(pos, powerBarY, "|")
+		end
 	end
 
 	if emptyWidth > 0 then
-		gpu.setBackground(black)
-		gpu.fill(powerBarX + fillWidth + 1, powerBarY, emptyWidth, powerBarHeight, " ")
+		-- gpu.setBackground(black)
+		-- gpu.fill(powerBarX + fillWidth + 1, powerBarY, emptyWidth, powerBarHeight, " ")
+		for pos=powerBarX+fillWidth+1,powerBarX+powerBarWidth do
+			gpu.set(pos,powerBarY, ".")
+		end
 	end
 
 	gpu.setBackground(black)
