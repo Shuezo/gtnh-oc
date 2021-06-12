@@ -125,7 +125,7 @@ function Power.checkStorage()
 	local total = 0
 		
 	repeat
-		total = total + chest.getStackInSlot(4,i)["size"]
+		total = total + chest.getStackInSlot(4,i)["damage"]
 		i = i + 1
 	until chest.getStackInSlot(4,i) == nil
 		
