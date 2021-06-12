@@ -63,16 +63,16 @@ end --end charFrame
 function Graphic.drawLabel()
 	local w, h = gpu.getResolution()
 	local x = 10
-	local y = 4
+	local y = 3
 	gpu.set(1,1,"------------ Power Monitoring  System ------------")
 	gpu.set(x,y,"Status")
 		y=y+1
-	gpu.set(x-4,y,"--------------------------------------")
-		y=y+1
+	--gpu.set(x-4,y,"--------------------------------------")
+	--	y=y+1
 	gpu.set(x,y,"Output")
 		y=y+1
-	gpu.set(x,y,"Heat")
-		y=y+1
+--	gpu.set(x,y,"Heat")
+	--	y=y+1
 	gpu.set(x-4,y,"--------------------------------------")
 		y=y+1
 	gpu.set(x,y,"Battery")
@@ -81,7 +81,9 @@ function Graphic.drawLabel()
 		y=y+1
 	gpu.set(x-4,y,"--------------------------------------")
 		y=y+1
-	gpu.set(x,y,"Remaining")
+	gpu.set(x,y,"Time to F/E")
+		y=y+1
+	-- adding a space
 		y=y+1
 	Graphic.drawPowerBar(white, black, x-4, y, x+34, y+3)
 end --end drawLabel
@@ -91,23 +93,23 @@ function Graphic.drawData()
 	local rem = Power.timeRemaining()
 	local status = Power.checkStatus()
 	local output = Power.checkEnergy()
-	local heat = Power.checkHeatPercent()
+	--local heat = Power.checkHeatPercent()
 	local bat = Power.checkBatteryPercent()
+	local storage = Power.checkStorage()
+	local fuel = Power.checkFuelRem()
 
 	local w, h = gpu.getResolution()
 	local x = w-25
-	local y = 4
+	local y = 3
 	
 	if status == true then gpu.set(x,y,"ON    ") else gpu.set(x,y,"OFF    ") end
 		y=y+1
-	--Adding a space
-		y=y+1
 	gpu.set(x,y, string.format("%.0f EU/t    ", output))
 		y=y+1
-	gpu.set(x,y,heat)
-		y=y+1
+	--gpu.set(x,y,heat)
+	--	y=y+1
 	--Adding a space
-		y=y+1
+	--	y=y+1
 	gpu.set(x,y,bat)
 		y=y+1
 	if energy > 0 then gpu.set(x,y,string.format("+%.0f EU/t    ", energy)) else gpu.set(x,y,string.format("%.0f EU/t    ", energy)) end
@@ -116,7 +118,9 @@ function Graphic.drawData()
 		y=y+1
 	gpu.set(x,y,rem)
 		y=y+1
-	
+	gpu.set(10,y, string.format(fuel.."remains".." + "..storage.."in buffer"))
+		y=y+1
+		y=y+1	
 	Graphic.updatePowerBar()
 end --end drawData
 

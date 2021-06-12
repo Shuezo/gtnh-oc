@@ -120,22 +120,53 @@ function Power.reactorOn()
 	redstone.setOutput(redstoneOn)
 end --end reactorOn
 
-function Power.checkStorage()
+function Power.checkStorage() --returns EU from durability of fuel rods in buffer chest
 	local i = 1
 	local total = 0
+	local output = ''
 		
 	repeat
 		total = total + chest.getStackInSlot(4,i)["damage"]
 		i = i + 1
 	until chest.getStackInSlot(4,i) == nil
+
+	total = 192000 * total --192k EU per 1 durability of quad thorium rods.
+
+	if total < 100000 then
+		break
+	elseif total >= 100000 and total < 1000000 then
+		total = total / 1000
+		output = string.format("%.0fK EU", total)
+	elseif total >=1000000 and total < 1000000000 then
+		total = total / 1000000
+		output = string.format("%.0fM EU", total)
+	elseif total > 1000000000 then
+		total = total /  1000000000
+		output = string.format("%.0fB EU", total)
+	end
 		
-	return total
+	return output
 end --end checkStorage
 
-function Power.checkFuelRem() --returns durability remaining for fuel rods in reactor
-	x = chest.getStackInSlot(2,20)["damage"]
-	x = 100-x
-	return x
+function Power.checkFuelRem() --returns approx EU from durability remaining for fuel rods in reactor
+	local total = 0
+	local output = ''
+	
+	total = chest.getStackInSlot(2,20)["damage"]
+	total = (100-x)*10 --10 fuel rods total
+
+	if total < 1000000 then
+		total = total / 1000
+		output = string.format("%.0fK EU", total)
+	elseif total >=1000000 and total < 1000000000 then
+		total = total / 1000000
+		output = string.format("%.0fM EU", total)
+	elseif total > 1000000000 then
+		total = total /  1000000000
+		output = string.format("%.0fB EU", total)
+	end
+
+	return output
 end --end checkFuelRem
 
 return Power
