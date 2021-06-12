@@ -99,7 +99,7 @@ function Power.timeRemaining()
 	end
 
 	return t
-end
+end --end timeRemaining
 
 --Event handler to power on/off the reactor
 function Power.reactorPower()
@@ -108,16 +108,34 @@ function Power.reactorPower()
 	else
 		Power.reactorOff()
 	end
-end
+end --end reactorPower
 
 function Power.reactorOff()
 	local redstoneOff = { 0,  0,  0,  0,  0,  0}
 	redstone.setOutput(redstoneOff)
-end
+end --end reactorOff
 
 function Power.reactorOn()
 	local redstoneOn  = {15, 15, 15, 15, 15, 15}
 	redstone.setOutput(redstoneOn)
-end
+end --end reactorOn
+
+function Power.checkStorage()
+	local i = 1
+	local total = 0
+		
+	repeat
+		total = total + chest.getStackInSlot(4,i)["size"]
+		i = i + 1
+	until chest.getStackInSlot(4,i) == nil
+		
+	return total
+end --end checkStorage
+
+function Power.checkFuelRem() --returns durability remaining for fuel rods in reactor
+	x = chest.getStackInSlot(2,20)["damage"]
+	x = 100-x
+	return x
+end --end checkFuelRem
 
 return Power
