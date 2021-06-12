@@ -122,7 +122,7 @@ function Graphic.drawData()
 		y=y+1
 	--Adding a space
 		y=y+2
-	gpu.set(10,y, string.format(fuel.." remains  +  "..storage.." in buffer"))
+	gpu.set(10,y, string.format(fuel.." remains + "..storage.." in buffer      "))
 		y=y+2	
 	Graphic.updatePowerBar()
 end --end drawData
