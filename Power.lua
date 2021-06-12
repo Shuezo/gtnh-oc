@@ -121,17 +121,16 @@ function Power.reactorOn()
 end --end reactorOn
 
 function Power.checkStorage() --returns EU from durability of fuel rods in buffer chest
-	local i = 1
 	local total = 0
 	local output = ''
-		
-	repeat
+	local m = chest.getInventorySize(4)
+
+	for i=1,m do
 		if chest.getStackInSlot(4,i) ~= nil then
 			total = total + ((100 - chest.getStackInSlot(4,i)["damage"]) * chest.getStackInSlot(4,i)["size"])
-			i = i + 1
 		else
 		end
-	until chest.getStackInSlot(4,i) == nil
+	end
 
 	total = 192000 * total --192k EU per 1 durability of quad thorium rods.
 
