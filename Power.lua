@@ -133,7 +133,7 @@ function Power.checkStorage() --returns EU from durability of fuel rods in buffe
 	total = 192000 * total --192k EU per 1 durability of quad thorium rods.
 
 	if total < 100000 then
-		utput = string.format("%.0f EU", total)
+		output = string.format("%.0f EU", total)
 	elseif total >= 100000 and total < 1000000 then
 		total = total / 1000
 		output = string.format("%.0fK EU", total)
