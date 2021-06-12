@@ -88,6 +88,7 @@ function Graphic.drawLabel()
 	Graphic.drawPowerBar(white, black, x-4, y, x+34, y+3) --to be updated later
 
 	gpu.set(1,h,"--------------------------------------------------")
+	Graphic.drawPowerBar(white, black, x-4, y, x+34, y+3) --to be updated later
 end --end drawLabel
 
 function Graphic.drawData()
