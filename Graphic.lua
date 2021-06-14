@@ -1,7 +1,7 @@
 --[[
 Date: 2021/06/05 
 Author: A. Jones & S. Huezo
-Version: 0.1
+Version: 1.0
 Usage: To be used in conjunction with Monitor.lua
 ]]--
 ------------Variables------------
@@ -14,18 +14,27 @@ local Power = require("Power")
 local gpu = component.gpu
 local x, y = 0, 0
 
-local white = 0xFFFFFF --Main Color
-local black = 0x000000 --Accessory Color
+local color = { blue 		= 0x4286F4,
+				darkAqua	= 0x3392FF,
+				purple 		= 0xB673d6,
+				red 		= 0xC14141,
+				green 		= 0x0DA841,
+  				black 		= 0x000000,
+				white 		= 0xFFFFFF,
+				grey 		= 0x252525,
+				lightGrey 	= 0xBBBBBB,
+				darkGrey 	= 0x262626 }
 
 local powerBarX
 local powerBarY
 local powerBarWidth
 local powerBarHeight
-local powerBarColor = 0xFFFFFF
+local powerBarColor = colorB
 
-------------Functions------------
+------------Generic Functions------------
 
 function Graphic.clearScreen()
+	gpu.setBackground(color.black)
 	local w, h = gpu.getResolution()
 	gpu.fill(1, 1, w, h, " ")
 end --clears the screen
@@ -47,47 +56,38 @@ function Graphic.setupResolution()
 	end
 end --end setupResolution
 
-function Graphic.drawFrame()
-	gpu.setForeground(black)
-	gpu.setBackground(white)
-	gpu.fill(1, 1, 50, 1, " ") --top
-	gpu.fill(1, 16, 50, 1, " ")  --bottom
-	gpu.fill(1, 2, 2, 14, " ")  --left
-	gpu.fill(49, 2, 2, 14, " ")  --right
+function Graphic.drawBox(clr, x1, y1, x2, y2)
+	local width  = x2 - x1 + 1
+	local height = y2 - y1 + 1
+	local bg = gpu.getBackground()
+	gpu.setBackground(clr)
+	gpu.fill(x1, y1, width, height, " ")
+	
+	gpu.setBackground(bg)
 
-	gpu.setForground(white)
-	gpu.setBackground(black)
-	gpu.fill(3, 2, 46, 14, " ") --center, black
-end --end charFrame
+	if width > 2 or height > 2 then
+		gpu.fill(x1+1, y1+1, width-2, height-2, " ")
+	end
+end --end drawBox
+
+------------Specific Functions------------
 
 function Graphic.drawLabel()
 	local w, h = gpu.getResolution()
 	local x = 10
 	local y = 3
-	gpu.set(1,1,"------------ Power Monitoring  System ------------")
-	gpu.set(x,y,"Status")
+	gpu.setBackground(color.darkGrey)
+	gpu.setForeground(color.darkAqua)
+	gpu.set(1,1,"-=-=-=-=-=-=-=-=-=-=-=-=-=-= Base Monitoring System =-=-=-=-=-=-=-=-=-=-=-=-=-=-")
+	gpu.setBackground(color.black)
+	gpu.setForeground(color.white)
+	gpu.set(x,y,"Reactor Status")
 		y=y+1
-	--gpu.set(x-4,y,"--------------------------------------")
-	--	y=y+1
-	gpu.set(x,y,"Output")
-		y=y+1
---	gpu.set(x,y,"Heat")
-	--	y=y+1
-	gpu.set(x-4,y,"--------------------------------------")
-		y=y+1
-	gpu.set(x,y,"Battery")
-		y=y+1
-	gpu.set(x,y,"Usage")
-		y=y+1
-	gpu.set(x-4,y,"--------------------------------------")
-		y=y+1
-	gpu.set(x,y,"Time to F/E")
-		y=y+1
-	-- adding a space
-		y=y+3
-	Graphic.drawPowerBar(white, black, x-4, y, x+34, y+3) --to be updated later
+	gpu.set(x,y,"Reactor Output")
+		y=y+2
+	gpu.set(x,y,"Power Usage")
 
-	gpu.set(1,h,"--------------------------------------------------")
+	Graphic.drawPowerBar(1, h-2, w, h) --initially draws power bar
 end --end drawLabel
 
 function Graphic.drawData()
@@ -101,56 +101,47 @@ function Graphic.drawData()
 	local fuel = Power.checkFuelRem()
 
 	local w, h = gpu.getResolution()
-	local x = w-25
+	local x = 30
 	local y = 3
-	
-	if status == true then gpu.set(x,y,"ON    ") else gpu.set(x,y,"OFF    ") end
+
+	if status == true then
+		gpu.setForeground(color.green)
+		gpu.set(x,y,"ON    ")
+		gpu.setForeground(color.white)
+		gpu.set(x+20,y,rem)
+	else
+		gpu.setForeground(color.red)
+		gpu.set(x,y,"OFF    ")
+		gpu.setForeground(color.white)
+		gpu.set(x+20,y,rem)
+	end
 		y=y+1
 	gpu.set(x,y, string.format("%.0f EU/t    ", output))
 		y=y+1
-	--gpu.set(x,y,heat)
-	--	y=y+1
-	--Adding a space
-		y=y+1
-	gpu.set(x,y,bat)
+	gpu.setBackground(color.darkGrey)
+	gpu.set(w/2-4,h-2,bat)
+	gpu.setBackground(color.black)
 		y=y+1
 	if energy > 0 then gpu.set(x,y,string.format("+%.0f EU/t    ", energy)) else gpu.set(x,y,string.format("%.0f EU/t    ", energy)) end
-		y=y+1
-	--Adding a space
-		y=y+1
-	gpu.set(x,y,rem)
-		y=y+1
-	--Adding a space
-		y=y+2
-	gpu.set(10,y, string.format(fuel.." remains + "..storage.." in buffer      "))
-		y=y+2	
-	Graphic.updatePowerBar()
+	gpu.set(10,h-4, string.format(fuel.." Fuel Remaining"))
+	gpu.set(w-26,h-4, string.format(storage.." in buffer"))
+
+	Graphic.updatePowerBar() --updates power bar on tick
 end --end drawData
 
-function Graphic.drawBox(color, fill, x1, y1, x2, y2)
-	local width  = x2 - x1
-	local height = y2 - y1
+------------Power Bar------------
 
-	gpu.setBackground(color)
-	gpu.fill(x1, y1, width, height, " ")
-	
-	gpu.setBackground(fill)
+function Graphic.drawPowerBar(x1, y1, x2, y2)
+	Graphic.drawBox(color.darkGrey, x1, y1, x2, y2)
+	Graphic.drawBox(color.darkGrey, x1+1, y1, x2-1, y2)
 
-	if width > 2 or height > 2 then
-		gpu.fill(x1+1, y1+1, width-2, height-2, " ")
-	end
-end --end drawFrame
+	powerBarX 		= x1 + 2
+	powerBarY 		= y1 + 1
+	powerBarWidth  	= x2 - x1 - 4
+	powerBarHeight 	= y2 - y1 - 2
 
-function Graphic.drawPowerBar(color, fill, x1, y1, x2, y2)
-	--Graphic.drawBox(color, fill, x1, y1, x2, y2) --to be updated later
-	
-	powerBarX = x1+1
-	powerBarY = y1+1
-	powerBarWidth  = x2 - x1 - 2
-	powerBarHeight = y2 - y1 - 2
-
-	Graphic.updatePowerBar(color)
-end
+	Graphic.updatePowerBar()
+end --end drawPowerBar (this function gets run only once at setup)
 
 function Graphic.updatePowerBar()
 	local powerLevel = Power.checkBatteryLevel()
@@ -159,23 +150,24 @@ function Graphic.updatePowerBar()
 
 	local pos
 	if fillWidth > 0 then
-		-- gpu.setBackground(powerBarColor)
-		-- gpu.fill(powerBarX, powerBarY, fillWidth, powerBarHeight, " ")
+		gpu.setBackground(color.green)
+		--gpu.fill(powerBarX, powerBarY, fillWidth, powerBarHeight, " ")
 
 		for pos=powerBarX,powerBarX+fillWidth do
-			gpu.set(pos, powerBarY, "|")
+			gpu.set(pos, powerBarY, " ")
 		end
 	end
 
 	if emptyWidth > 0 then
-		-- gpu.setBackground(black)
-		-- gpu.fill(powerBarX + fillWidth + 1, powerBarY, emptyWidth, powerBarHeight, " ")
+		gpu.setBackground(color.red)
+		--gpu.fill(powerBarX + fillWidth + 1, powerBarY, emptyWidth, powerBarHeight, " ")
+		
 		for pos=powerBarX+fillWidth+1,powerBarX+powerBarWidth do
-			gpu.set(pos,powerBarY, ".")
+			gpu.set(pos,powerBarY, " ")
 		end
 	end
 
-	gpu.setBackground(black)
-end
+	gpu.setBackground(color.black)
+end --end UpdatePowerBar
 
 return Graphic
