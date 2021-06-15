@@ -8,17 +8,21 @@ package.loaded.Power = nil  --Free memory
 package.loaded.Monitor = nil
 package.loaded.Graphic = nil
 
-------------Variables------------
+------------Initilized Values------------
 local component = require("component")
 local Power = require("Power")
 local Graphic = require("Graphic")
 local event = require("event")
 local keyboard = require("keyboard")
 
-local updateTimer
+local timer1
+local timer5
 local keyListener
-local powerTimer
 local done = false
+
+------------Variables------------
+
+local title = "MONITORING SYSTEM"
 
 ----------Functions----------
 
@@ -28,8 +32,13 @@ local function setKey(e)
     end
 end
 
-local function tick(e)
-    Graphic.drawData()
+local function mainUpdate(e)
+    Power.reactorPower()
+    Graphic.updateData()
+end
+
+local function quickUpdate(e)
+    Graphic.updatePowerBar(2, 24, 76)
 end
 
 ------------Main------------
@@ -37,12 +46,13 @@ end
 --setup start screen
 Graphic.setupResolution()
 Graphic.clearScreen()
-Graphic.drawLabel()
-Graphic.drawData()
+Graphic.drawTitle(title)
+Graphic.drawBox()
+Graphic.drawLabel(10, 3)
 
 --start timers/listeners
-updateTimer = event.timer(2, tick, math.huge)
-powerTimer = event.timer(1, Power.reactorPower, math.huge)
+timer1 = event.timer(1, quickUpdate, math.huge)
+timer5 = event.timer(5, mainUpdate, math.huge)
 event.listen("key_down", setKey)
 
 --loop until key = x
@@ -51,9 +61,9 @@ while not done do
 end
 
 -----Exit-----
-event.ignore("key_down", tick)
-event.cancel(updateTimer)
-event.cancel(powerTimer)
+event.ignore("key_down", mainUpdate)
+event.cancel(timer1)
+event.cancel(timer5)
 
 Power.reactorOff()
 Graphic.clearScreen()

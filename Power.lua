@@ -15,6 +15,8 @@ local chest    = component.proxy("fa458337-2bdd-4161-94f1-c126ce8571ef")
 local bat      = component.proxy("e4ecc183-dfe1-4fd0-a68f-56589d54902b")
 local redstone = component.proxy("3c96c747-346c-422d-bae0-bc1918f43ea6")
 
+reactorStatus = nil
+
 ----------Functions----------
 
 --Parsing Data from the API for the reactor
@@ -103,7 +105,7 @@ end --end timeRemaining
 
 --Event handler to power on/off the reactor
 function Power.reactorPower()
-	if Power.checkBatteryLevel() < 1 then
+	if reactorStatus == false and Power.checkBatteryLevel() < 0.9 then
 		Power.reactorOn()
 	else
 		Power.reactorOff()
@@ -113,11 +115,13 @@ end --end reactorPower
 function Power.reactorOff()
 	local redstoneOff = { 0,  0,  0,  0,  0,  0}
 	redstone.setOutput(redstoneOff)
+	reactorStatus = false
 end --end reactorOff
 
 function Power.reactorOn()
 	local redstoneOn  = {15, 15, 15, 15, 15, 15}
 	redstone.setOutput(redstoneOn)
+	reactorStatus = true
 end --end reactorOn
 
 function Power.checkStorage() --returns EU from durability of fuel rods in buffer chest
