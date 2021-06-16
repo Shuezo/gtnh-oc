@@ -14,31 +14,34 @@ local Power = require("Power")
 local Graphic = require("Graphic")
 local event = require("event")
 local keyboard = require("keyboard")
+local thread = require("thread")
+
+local mainThread
+local quickThread
+local exitThread
 
 local timer1
 local timer5
-local keyListener
-local done = false
+local running = true
 
 ------------Variables------------
 
 local title = "MONITORING SYSTEM"
+local exitBtn = {x = W, 
+                 y = 1}
 
 ----------Functions----------
 
-local function setKey(e)
-    if keyboard.isKeyDown(keyboard.keys.x) then
-        done = true
+local function mainUpdate(e)
+    if mainThread:status() == "suspended" then
+        mainThread:resume()
     end
 end
 
-local function mainUpdate(e)
-    Power.reactorPower()
-    Graphic.updateData()
-end
-
 local function quickUpdate(e)
-    Graphic.updatePowerBar(2, 24, 76)
+    if quickThread:status() == "suspended" then
+        quickThread:resume()
+    end
 end
 
 ------------Main------------
@@ -47,23 +50,50 @@ end
 Graphic.setupResolution()
 Graphic.clearScreen()
 Graphic.drawTitle(title)
-Graphic.drawBox()
+Graphic.drawBox(COLOR.darkGrey,1,H-3,W,H)
 Graphic.drawLabel(10, 3)
+Graphic.drawExit(exitBtn.x, exitBtn.y)
 
 --start timers/listeners
-timer1 = event.timer(1, quickUpdate, math.huge)
+timer1 = event.timer(10, quickUpdate, math.huge)
 timer5 = event.timer(5, mainUpdate, math.huge)
-event.listen("key_down", setKey)
 
---loop until key = x
-while not done do
-    os.sleep(0.1)
+----------------Threads----------------
+
+mainThread = thread.create(function ()
+    while true do
+        Power.reactorPower()
+        Graphic.updateData()
+        thread.current():suspend()
+    end
+end)
+ 
+quickThread = thread.create(function ()
+    while true do
+        Graphic.updatePowerBar(2, 24, 76)
+        thread.current():suspend()
+    end
+end)
+
+
+local x, y
+while true do --loop until x is touched
+    _, _, x, y = event.pull("touch")
+    if x == exitBtn.x and y == exitBtn.y then
+        break
+    end
 end
 
 -----Exit-----
-event.ignore("key_down", mainUpdate)
 event.cancel(timer1)
 event.cancel(timer5)
 
+quickThread:kill()
+mainThread:kill()
+
 Power.reactorOff()
 Graphic.clearScreen()
+
+--clean up globals
+W, H, COLOR = nil, nil, nil
+
