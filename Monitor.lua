@@ -70,7 +70,7 @@ end)
  
 quickThread = thread.create(function ()
     while true do
-        Graphic.updatePowerBar(3, 24, 76)
+        Graphic.updatePowerBar(3, H-1, W-4)
         thread.current():suspend()
     end
 end)

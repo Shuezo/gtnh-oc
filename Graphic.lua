@@ -132,21 +132,30 @@ function Graphic.updatePowerBar(x, y, powerBarWidth)
 	local powerLevel = Power.checkBatteryLevel()
 	local fillWidth = math.floor(powerBarWidth * powerLevel)
 	local bat = Power.checkBatteryPercent()
-
+	local textX = Graphic.centerText((x + powerBarWidth)/2, bat)
+	local emptyWidth = powerBarWidth - fillWidth - 1
 
 	if fillWidth > 0 then
 		gpu.setBackground(COLOR.green)
-		gpu.fill(x, y, fillWidth, 1, " ")
+		for pos=x,x+fillWidth do
+			if pos>=textX and pos<textX+string.len(bat) then
+				gpu.set(pos, y, string.sub(bat,1+pos-textX,1+pos-textX))
+			else
+				gpu.set(pos,y," ")
+			end
+		end
 	end
 
-	if fillWidth < 0 then
+	if emptyWidth > 0 then
 		gpu.setBackground(COLOR.red)
-		gpu.fill(x, y, powerBarWidth, 1, " ")
+		for pos=x+fillWidth+1,x+powerBarWidth-1 do
+			if pos>=textX and pos<textX + string.len(bat) then
+				gpu.set(pos, y, string.sub(bat,pos-textX+1,pos-textX+1))
+			else
+				gpu.set(pos,y," ")
+			end
+		end
 	end
-
-	gpu.setBackground(COLOR.black)
-	local textX = Graphic.centerText((x + powerBarWidth)/2, bat)
-	gpu.set(textX,y,bat)
 
 	gpu.setBackground(COLOR.black)
 end --end UpdatePowerBar
@@ -180,7 +189,7 @@ end --end drawLabel
 ---------------Text Util---------------
 
 function Graphic.centerText(x, text)
-	local xLeft = x - string.len(text)/2
+	local xLeft = math.floor(x - string.len(text)/2)
 	return xLeft
 end --end centerText
 
