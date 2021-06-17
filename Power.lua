@@ -70,7 +70,7 @@ function Power.checkBatteryLevel()
 end
 
 function Power.checkBatteryPercent()
-    return string.format("%.2f%%   ", Power.checkBatteryLevel() * 100)
+    return string.format("%.2f%%", Power.checkBatteryLevel() * 100)
 end
 
 function Power.timeRemaining()

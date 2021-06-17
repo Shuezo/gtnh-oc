@@ -9,11 +9,12 @@ local Graphic = {}
 
 local component = require("component")
 local term = require("term")
+local string    = require("string")
 local Power = require("Power")
+local Cleanroom = require("Cleanroom")
 
 local gpu = component.gpu
 
-W, H = gpu.getResolution()
 COLOR = { blue 		= 0x4286F4,
 		  darkAqua	= 0x3392FF,
 		  purple 	= 0xB673d6,
@@ -25,7 +26,7 @@ COLOR = { blue 		= 0x4286F4,
 		  lightGrey = 0xBBBBBB,
 		  darkGrey 	= 0x262626 }
 
-------------Functions------------
+------------Generic Functions------------
 
 function Graphic.clearScreen()
 	gpu.setBackground(COLOR.black)
@@ -39,9 +40,11 @@ function Graphic.setupResolution()
 	if (W ~= maxW) and (H ~= maxH) then
 		gpu.setResolution(maxW, maxH)
 		local x, y = gpu.getResolution()
+		W, H = x, y
 		return true
 	elseif (W == maxW and H == maxH) then
 		local x, y = gpu.getResolution()
+		W, H = x, y
 		return true
 	else
 		return false
@@ -82,7 +85,9 @@ function Graphic.drawTitle(text)
 	gpu.setForeground(COLOR.white)
 end --end drawTitle
 
-function Graphic.drawLabel(x, y)
+------------Power Functions------------
+
+function Graphic.drawPowerLabel(x, y)
 	gpu.set(x,y,"Reactor Status")
 	y=y+1
 	gpu.set(x,y,"Reactor Output")
@@ -90,7 +95,7 @@ function Graphic.drawLabel(x, y)
 	gpu.set(x,y,"Power Usage")
 end --end drawLabel
 
-function Graphic.updateData()
+function Graphic.updatePowerData(x, y)
 	local energy = Power.energyUsage()
 	local rem = Power.timeRemaining()
 	local status = Power.checkStatus()
@@ -98,9 +103,6 @@ function Graphic.updateData()
 	--local heat = Power.checkHeatPercent()
 	--local storage = Power.checkStorage()
 	--local fuel = Power.checkFuelRem()
-
-	local x = 30
-	local y = 3
 
 	if Power.reactorStatus == true then
 		gpu.setForeground(COLOR.green)
@@ -131,16 +133,20 @@ function Graphic.updatePowerBar(x, y, powerBarWidth)
 	local fillWidth = math.floor(powerBarWidth * powerLevel)
 	local bat = Power.checkBatteryPercent()
 
-	gpu.setBackground(COLOR.darkGrey)
-	gpu.set((x + powerBarWidth)/2-2,y-1,bat)
-
-	gpu.setBackground(COLOR.red)
-	gpu.fill(x, y, powerBarWidth, 1, " ")
 
 	if fillWidth > 0 then
 		gpu.setBackground(COLOR.green)
 		gpu.fill(x, y, fillWidth, 1, " ")
 	end
+
+	if fillWidth < 0 then
+		gpu.setBackground(COLOR.red)
+		gpu.fill(x, y, powerBarWidth, 1, " ")
+	end
+
+	gpu.setBackground(COLOR.black)
+	local textX = Graphic.centerText((x + powerBarWidth)/2, bat)
+	gpu.set(textX,y,bat)
 
 	gpu.setBackground(COLOR.black)
 end --end UpdatePowerBar
@@ -153,6 +159,29 @@ function Graphic.drawExit(x,y)
 	
 	gpu.setBackground(bg)
 	gpu.setForeground(fg)
-end
+end --end drawExit
+
+------------Cleanroom Functions------------
+
+function Graphic.updateCleanroomStatus(x, y)
+	if Cleanroom.getProblems() == '0' then
+		gpu.set(x,y,"Cleanroom is ")
+		gpu.setForeground(COLOR.green)
+		gpu.set(x,y+1,"     OK      ")
+		gpu.setForeground(COLOR.white)
+	else
+		gpu.set(x,y,"Cleanroom has")
+		gpu.setForeground(COLOR.red)
+		gpu.set(x,y+1,"  Problems!  ")
+		gpu.setForeground(COLOR.white)
+	end
+end --end drawLabel
+
+---------------Text Util---------------
+
+function Graphic.centerText(x, text)
+	local xLeft = x - string.len(text)/2
+	return xLeft
+end --end centerText
 
 return Graphic
