@@ -28,6 +28,11 @@ COLOR = { blue 		= 0x4286F4,
 
 ------------Generic Functions------------
 
+function Graphic.centerText(x, text)
+	local xLeft = math.floor(x - string.len(text)/2)
+	return xLeft
+end --end centerText
+
 function Graphic.clearScreen()
 	gpu.setBackground(COLOR.black)
 	gpu.fill(1, 1, W, H, " ")
@@ -85,6 +90,16 @@ function Graphic.drawTitle(text)
 	gpu.setForeground(COLOR.white)
 end --end drawTitle
 
+function Graphic.drawExit(x,y)
+	local bg = gpu.setBackground(COLOR.red)
+	local fg = gpu.setForeground(COLOR.white)
+
+	gpu.fill(x,y,1,1,"X")
+	
+	gpu.setBackground(bg)
+	gpu.setForeground(fg)
+end --end drawExit
+
 ------------Power Functions------------
 
 function Graphic.drawPowerLabel(x, y)
@@ -104,7 +119,7 @@ function Graphic.updatePowerData(x, y)
 	--local storage = Power.checkStorage()
 	--local fuel = Power.checkFuelRem()
 
-	if Power.reactorStatus == true then
+	if Power.checkStatus() == true then
 		gpu.setForeground(COLOR.green)
 		gpu.set(x,y,"ON    ")
 		gpu.setForeground(COLOR.white)
@@ -160,16 +175,6 @@ function Graphic.updatePowerBar(x, y, powerBarWidth)
 	gpu.setBackground(COLOR.black)
 end --end UpdatePowerBar
 
-function Graphic.drawExit(x,y)
-	local bg = gpu.setBackground(COLOR.red)
-	local fg = gpu.setForeground(COLOR.white)
-
-	gpu.fill(x,y,1,1,"X")
-	
-	gpu.setBackground(bg)
-	gpu.setForeground(fg)
-end --end drawExit
-
 ------------Cleanroom Functions------------
 
 function Graphic.updateCleanroomStatus(x, y)
@@ -185,12 +190,5 @@ function Graphic.updateCleanroomStatus(x, y)
 		gpu.setForeground(COLOR.white)
 	end
 end --end drawLabel
-
----------------Text Util---------------
-
-function Graphic.centerText(x, text)
-	local xLeft = math.floor(x - string.len(text)/2)
-	return xLeft
-end --end centerText
 
 return Graphic

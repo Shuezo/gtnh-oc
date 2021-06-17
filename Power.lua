@@ -103,7 +103,7 @@ end --end timeRemaining
 
 --Event handler to power on/off the reactor
 function Power.reactorPower()
-	if Power.checkBatteryLevel() < 0.9 then
+	if reactorStatus == false and Power.checkBatteryLevel() < 0.9 then
 		Power.reactorOn()
 	else
 		Power.reactorOff()
