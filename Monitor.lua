@@ -85,7 +85,6 @@ exitThread = thread.create(function ()
         if id == "interrupted" then
             break
         elseif id == "touch" then
-            print("touched")
             if x == W and y == 1 then
                 break
             end
