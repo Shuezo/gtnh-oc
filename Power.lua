@@ -30,9 +30,6 @@ function Power.checkHeatLevel()
     return reactor.getHeat() / reactor.getMaxHeat()
 end --end checkHeat
 
-function Power.checkHeatPercent()
-    return string.format("%.2f %%", Power.checkHeatLevel() * 100)
-end
 
 --Battery Buffer Calculations to get full charge (iterating through each battery until it reaches an empty slot)
 function Power.checkCurrentCharge()
@@ -69,10 +66,6 @@ function Power.checkBatteryLevel()
 	return Power.checkCurrentCharge() / Power.checkMaxCharge()
 end
 
-function Power.checkBatteryPercent()
-    return string.format("%.2f%%", Power.checkBatteryLevel() * 100)
-end
-
 function Power.timeRemaining()
 	local t = 0 --placeholder for time
 	local m = 0 --calculated minutes
@@ -103,8 +96,10 @@ end --end timeRemaining
 
 --Event handler to power on/off the reactor
 function Power.reactorPower()
-	if reactorStatus == false and Power.checkBatteryLevel() < 0.9 then
+	local status = Power.checkStatus()
+	if status == false and Power.checkBatteryLevel() < 0.95 then
 		Power.reactorOn()
+	elseif status == true and Power.checkBatteryLevel() < 0.95 then return
 	else
 		Power.reactorOff()
 	end
@@ -150,25 +145,8 @@ function Power.checkStorage() --returns EU from durability of fuel rods in buffe
 	return output
 end --end checkStorage
 
-function Power.checkFuelRem() --returns approx EU from durability remaining for fuel rods in reactor
-	local total = 0
-	local output = ''
-	
-	total = chest.getStackInSlot(2,20)["damage"]
-	total = (100-total) * 10 * 192000 --10 fuel rods total, 192k EU per durability point
-
-	if total < 1000000 then
-		total = total / 1000
-		output = string.format("%.0fK EU", total)
-	elseif total >=1000000 and total < 1000000000 then
-		total = total / 1000000
-		output = string.format("%.0fM EU", total)
-	elseif total > 1000000000 then
-		total = total /  1000000000
-		output = string.format("%.0fB EU", total)
-	end
-
-	return output
+function Power.checkFuelRem() --returns a value between 1 in 100 representing fuel remaining in reactor
+	return ( 100 - chest.getStackInSlot(2,20)["damage"] ) / 100
 end --end checkFuelRem
 
 return Power

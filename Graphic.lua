@@ -1,7 +1,7 @@
 --[[
 Date: 2021/06/05 
 Author: A. Jones & S. Huezo
-Version: 1.0
+Version: 1.2
 Usage: To be used in conjunction with Monitor.lua
 ]]--
 ------------Variables------------
@@ -10,8 +10,10 @@ local Graphic = {}
 local component = require("component")
 local term = require("term")
 local string    = require("string")
+
 local Power = require("Power")
 local Cleanroom = require("Cleanroom")
+local EBF = require("EBF")
 
 local gpu = component.gpu
 
@@ -29,9 +31,13 @@ COLOR = { blue 		= 0x4286F4,
 ------------Generic Functions------------
 
 function Graphic.centerText(x, text)
-	local xLeft = math.floor(x - string.len(text)/2)
+	local xLeft = math.ceil(x - string.len(text)/2)
 	return xLeft
 end --end centerText
+
+function Graphic.getPercent(val)
+    return string.format("%.2f%%", val * 100)
+end
 
 function Graphic.clearScreen()
 	gpu.setBackground(COLOR.black)
@@ -56,28 +62,47 @@ function Graphic.setupResolution()
 	end
 end --end setupResolution
 
-function Graphic.drawFrame(clr, x1, y1, x2, y2)
-	local powerBarWidth  = x2 - x1 + 1
-	local height = y2 - y1 + 1
+function Graphic.SplashScreen(textA, textB)
+	Graphic.drawBox(COLOR.darkGrey, 1, 1, W, H)
+	Graphic.drawExit(W, 1)
+	Graphic.drawFrame(COLOR.lightGrey, COLOR.darkGrey, W/2-10, H/2-2, W/2+10, H/2+2)
+	gpu.setForeground(COLOR.green)
+	gpu.setBackground(COLOR.darkGrey)
+	gpu.set(Graphic.centerText(W/2, textA),H/2-1, textA)
+	gpu.set(Graphic.centerText(W/2, textB),H/2, textB)
+	gpu.setForeground(COLOR.white)
+	gpu.setBackground(COLOR.black)
+end
+
+function Graphic.buffer()
+	--set buffer to not 0
+	--display data on buffer
+	--wait until data loads
+	--remove 
+	gpu.setActiveBuffer()
+end
+
+function Graphic.drawFrame(clr, fill, x1, y1, x2, y2)
+	local barWidth  = math.abs(x2 - x1) + 1
+	local height = math.abs(y2 - y1) + 1
 	local bg = gpu.getBackground()
-
-	gpu.setBackground(clr)
-	gpu.fill(x1, y1, powerBarWidth, height, " ")
 	
-	gpu.setBackground(bg)
+	gpu.setBackground(clr)
+	gpu.fill(x1, y1, barWidth, height, " ")
+	gpu.setBackground(fill)
 
-	if powerBarWidth > 2 or height > 2 then
-		gpu.fill(x1+1, y1+1, powerBarWidth-2, height-2, " ")
+	if barWidth > math.abs(2) or height > math.abs(2) then
+		gpu.fill(x1+1, y1+1, barWidth-2, height-2, " ")
 	end
-
+	gpu.setBackground(bg)
 end --end drawFrame
 
 function Graphic.drawBox(clr, x1, y1, x2, y2)
-	local powerBarWidth  = x2 - x1 + 1
+	local barWidth = x2 - x1 + 1
 	local height = y2 - y1 + 1
 	local bg = gpu.setBackground(clr)
 
-	gpu.fill(x1, y1, powerBarWidth, height, " ")
+	gpu.fill(x1, y1, barWidth, height, " ")
 	gpu.setBackground(bg)
 end --end drawBox
 
@@ -85,7 +110,7 @@ function Graphic.drawTitle(text)
 	gpu.setBackground(COLOR.darkGrey)
 	gpu.setForeground(COLOR.darkAqua)
 	gpu.fill(1,1,W,1," ")
-	gpu.set(W/2-string.len(text)/2,1,text)
+	gpu.set(Graphic.centerText(W/2, text),1,text)
 	gpu.setBackground(COLOR.black)
 	gpu.setForeground(COLOR.white)
 end --end drawTitle
@@ -115,7 +140,7 @@ function Graphic.updatePowerData(x, y)
 	local rem = Power.timeRemaining()
 	local status = Power.checkStatus()
 	local output = Power.checkEnergy()
-	--local heat = Power.checkHeatPercent()
+	--local heat = Power.checkHeatpercent()
 	--local storage = Power.checkStorage()
 	--local fuel = Power.checkFuelRem()
 
@@ -143,18 +168,26 @@ function Graphic.updatePowerData(x, y)
 	--Graphic.updatePowerBar() --updates power bar on tick
 end --end updateData
 
-function Graphic.updatePowerBar(x, y, powerBarWidth)
-	local powerLevel = Power.checkBatteryLevel()
-	local fillWidth = math.floor(powerBarWidth * powerLevel)
-	local bat = Power.checkBatteryPercent()
-	local textX = Graphic.centerText((x + powerBarWidth)/2, bat)
-	local emptyWidth = powerBarWidth - fillWidth - 1
+
+--[[Graphic.updatePowerBar(level, X, Y, barWidth)
+
+	level: 		Value to calculate bar fill and set label 
+	X:			Hor Bar Position
+	Y: 			Vertical Bar Position
+	barWidth: 	Width of bar
+
+]]--
+function Graphic.updatePowerBar(level, x, y, barWidth, fillColor, emptyColor)
+	local fillWidth = math.floor(barWidth * level)
+	local percent = Graphic.getPercent(level)
+	local textX = Graphic.centerText((x + barWidth)/2, percent)
+	local emptyWidth = barWidth - fillWidth - 1
 
 	if fillWidth > 0 then
-		gpu.setBackground(COLOR.green)
+		gpu.setBackground(fillColor)
 		for pos=x,x+fillWidth do
-			if pos>=textX and pos<textX+string.len(bat) then
-				gpu.set(pos, y, string.sub(bat,1+pos-textX,1+pos-textX))
+			if pos>=textX and pos<textX+string.len(percent) then
+				gpu.set(pos, y, string.sub(percent,1+pos-textX,1+pos-textX))
 			else
 				gpu.set(pos,y," ")
 			end
@@ -162,10 +195,10 @@ function Graphic.updatePowerBar(x, y, powerBarWidth)
 	end
 
 	if emptyWidth > 0 then
-		gpu.setBackground(COLOR.red)
-		for pos=x+fillWidth+1,x+powerBarWidth-1 do
-			if pos>=textX and pos<textX + string.len(bat) then
-				gpu.set(pos, y, string.sub(bat,pos-textX+1,pos-textX+1))
+		gpu.setBackground(emptyColor)
+		for pos=x+fillWidth+1,x+barWidth-1 do
+			if pos>=textX and pos<textX + string.len(percent) then
+				gpu.set(pos, y, string.sub(percent,pos-textX+1,pos-textX+1))
 			else
 				gpu.set(pos,y," ")
 			end
@@ -178,10 +211,15 @@ end --end UpdatePowerBar
 ------------Cleanroom Functions------------
 
 function Graphic.updateCleanroomStatus(x, y)
-	if Cleanroom.getProblems() == '0' then
+	if Cleanroom.getProblems() == '0' and Cleanroom.status() == true then
 		gpu.set(x,y,"Cleanroom is ")
 		gpu.setForeground(COLOR.green)
 		gpu.set(x,y+1,"     OK      ")
+		gpu.setForeground(COLOR.white)
+	elseif Cleanroom.getProblems() == '0' and Cleanroom.status() == false then
+		gpu.set(x,y,"Cleanroom is ")
+		gpu.setForeground(COLOR.red)
+		gpu.set(x,y+1,"  Inactive!  ")
 		gpu.setForeground(COLOR.white)
 	else
 		gpu.set(x,y,"Cleanroom has")
@@ -190,5 +228,27 @@ function Graphic.updateCleanroomStatus(x, y)
 		gpu.setForeground(COLOR.white)
 	end
 end --end drawLabel
+
+------------EBF Functions------------
+
+function Graphic.updateEBFStatus(x, y)
+	if EBF.getProblems() ~= '0' then
+		gpu.set(x,y,"    EBF has    ")
+		gpu.setForeground(COLOR.red)
+		gpu.set(x,y+1,"   Problems!   ")
+		gpu.setForeground(COLOR.white)
+		return
+	else
+		if EBF.status() == true then
+			local tally = 0
+			local task = EBF.craftingStatus()
+			gpu.set(x+1,y,"EBF Active: ")
+			gpu.set(x,y+1,task)
+		else
+			gpu.set(x,y,"    EBF is     ")
+			gpu.set(x,y+1,"   Inactive    ")
+		end
+	end		
+end
 
 return Graphic
