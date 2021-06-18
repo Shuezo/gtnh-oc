@@ -18,14 +18,12 @@ local component = require("component")
 local Power = require("Power")
 local Graphic = require("Graphic")
 
-local runtimeThread
 local mainThread
 local slowThread
 local exitThread
 
 local timer10
 local timer5
-local running = true
 
 local bat = 0
 local fuel = 0
@@ -64,6 +62,22 @@ end
 
 ------------Main------------
 
+--setup screen
+Graphic.setupResolution() --initial screen setup (hardware)
+Graphic.clearScreen()
+Graphic.SplashScreen("Initializing...", "Please Wait")
+--Graphic.buffer
+Graphic.clearScreen()
+Graphic.drawTitle(title) --draw title bar
+Graphic.drawBox(COLOR.darkGrey,1,H-3,W,H) --draw background for power bars
+Graphic.drawPowerLabel(10, 3) -- draw plain text labels for status, usage, etc.
+Graphic.drawExit(W, 1) --draw exit button
+slowFunction()
+mainFunction()
+--Graphic.unbuffer
+
+----------------Threads----------------
+
 exitThread = thread.create(function ()
     local id, x, y
     while true do --loop until x is touched
@@ -71,6 +85,7 @@ exitThread = thread.create(function ()
         if id == "interrupted" then
             break
         elseif id == "touch" then
+            print("touched")
             if x == W and y == 1 then
                 break
             end
@@ -78,50 +93,33 @@ exitThread = thread.create(function ()
     end
 end)
 
-runtimeThread = thread.create(function()
-    --setup screen
-    Graphic.setupResolution() --initial screen setup (hardware)
-    Graphic.clearScreen()
-    Graphic.SplashScreen("Initializing...", "Please Wait")
-    --Graphic.buffer
-    Graphic.clearScreen()
-    Graphic.drawTitle(title) --draw title bar
-    Graphic.drawBox(COLOR.darkGrey,1,H-3,W,H) --draw background for power bars
-    Graphic.drawPowerLabel(10, 3) -- draw plain text labels for status, usage, etc.
-    Graphic.drawExit(W, 1) --draw exit button
-    slowFunction()
-    mainFunction()
-    --Graphc.unbuffer
-
-    --start timers/listeners
-    local timer10 = event.timer(10, slowUpdate, math.huge)
-    local timer5 = event.timer(5, mainUpdate, math.huge)
-
-    ----------------Threads----------------
-
-    mainThread = thread.create(function ()
-        while true do
-            mainFunction()
-            thread.current():suspend()
-        end
-    end)
-    
-    slowThread = thread.create(function ()
-        while true do
-            slowFunction()
-            thread.current():suspend()
-        end
-    end)
-
-    mainThread:detach()
-    slowThread:detach()
+mainThread = thread.create(function ()
+    while true do
+        mainFunction()
+        thread.current():suspend()
+    end
 end)
+
+slowThread = thread.create(function ()
+    while true do
+        slowFunction()
+        thread.current():suspend()
+    end
+end)
+
+--start timers/listeners
+timer10 = event.timer(10, slowUpdate, math.huge)
+timer5 = event.timer(5, mainUpdate, math.huge)
 
 thread.waitForAny({exitThread})
 
 -----Exit-----
 
-runtimeThread:kill()
+event.cancel(timer10)
+event.cancel(timer5)
+
+mainThread:kill()
+slowThread:kill()
 exitThread:kill()
 
 Power.reactorOff()
