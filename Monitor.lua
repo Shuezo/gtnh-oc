@@ -18,21 +18,26 @@ local component = require("component")
 local Power = require("Power")
 local Graphic = require("Graphic")
 
+local gpu = component.gpu
+
 local mainThread
 local slowThread
 local exitThread
+local dataThread
+local barThread
 
 local timer10
-local timer5
+local timer2
+local dataTimer
+local barTimer
 
-local bat = 0
-local fuel = 0
+local locked = false
 
 ------------Variables------------
 
 local title = "MONITORING SYSTEM"
 
-----------Functions----------
+----------Thread Functions----------
 
 local function mainUpdate(e)
     if mainThread:status() == "suspended" then
@@ -46,18 +51,41 @@ local function slowUpdate(e)
     end
 end
 
+local function dataUpdate(e)
+    if dataThread:status() == "suspended" then
+        dataThread:resume()
+    end
+end
+
+local function barUpdate(e)
+    if barThread:status() == "suspended" then
+        barThread:resume()
+    end
+end
+
+---------Main Functions---------
+
 local function mainFunction()
     Power.reactorPower()
     Graphic.updatePowerData(30, 3)
     Graphic.updateCleanroomStatus(10, 9)
     Graphic.updateEBFStatus(50, 9)
-    Graphic.updatePowerBar(bat, 3, H-1, W-4, COLOR.green, COLOR.red)
-    Graphic.updatePowerBar(fuel, 3, H-2, W-4, COLOR.blue, COLOR.purple)
+    
 end
 
 local function slowFunction()
-    bat = Power.checkBatteryLevel()
-    fuel = Power.checkFuelRem()
+    Power.updateBatData()
+end
+
+local function calcDataFunction()
+    Power.calcBatData()
+end
+
+local function barFunction()
+    local bat = Power.checkBatteryLevel()
+    local fuel = Power.checkFuelRem()
+    Graphic.updatePowerBar(bat, 3, H-1, W-5, COLOR.green, COLOR.red)
+    Graphic.updatePowerBar(fuel, 3, H-2, W-5, COLOR.blue, COLOR.purple)
 end
 
 ------------Main------------
@@ -66,15 +94,25 @@ end
 Graphic.setupResolution() --initial screen setup (hardware)
 Graphic.clearScreen()
 Graphic.SplashScreen("Initializing...", "Please Wait")
---Graphic.buffer
+
+--buffer
+local buf = gpu.allocateBuffer(W,H)
+gpu.setActiveBuffer(buf)
+
 Graphic.clearScreen()
 Graphic.drawTitle(title) --draw title bar
 Graphic.drawBox(COLOR.darkGrey,1,H-3,W,H) --draw background for power bars
 Graphic.drawPowerLabel(10, 3) -- draw plain text labels for status, usage, etc.
 Graphic.drawExit(W, 1) --draw exit button
 slowFunction()
+calcDataFunction()
 mainFunction()
---Graphic.unbuffer
+barFunction()
+
+os.sleep(0.5)
+--load buffer onto screen
+gpu.bitblt(0, 1, 1, W, H, buf, 1, 1)
+gpu.freeBuffer(buf)
 
 ----------------Threads----------------
 
@@ -106,20 +144,39 @@ slowThread = thread.create(function ()
     end
 end)
 
+dataThread = thread.create(function ()
+    while true do
+        calcDataFunction()
+        thread.current():suspend()
+    end
+end)
+
+barThread = thread.create(function ()
+    while true do
+        barFunction()
+        thread.current():suspend()
+    end
+end)
+
 --start timers/listeners
-timer10 = event.timer(10, slowUpdate, math.huge)
-timer5 = event.timer(5, mainUpdate, math.huge)
+timer10     = event.timer(10, slowUpdate, math.huge)
+timer2      = event.timer(2, mainUpdate, math.huge)
+dataTimer   = event.timer(0.5, dataUpdate, math.huge)
+barTimer    = event.timer(0.5, barUpdate, math.huge)
 
 thread.waitForAny({exitThread})
 
 -----Exit-----
 
 event.cancel(timer10)
-event.cancel(timer5)
+event.cancel(timer2)
+event.cancel(dataTimer)
+event.cancel(barTimer)
 
 mainThread:kill()
 slowThread:kill()
 exitThread:kill()
+dataThread:kill()
 
 Power.reactorOff()
 Graphic.clearScreen()

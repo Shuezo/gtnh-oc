@@ -15,65 +15,112 @@ local chest    = component.proxy("fa458337-2bdd-4161-94f1-c126ce8571ef")
 local bat      = component.proxy("e4ecc183-dfe1-4fd0-a68f-56589d54902b")
 local redstone = component.proxy("3c96c747-346c-422d-bae0-bc1918f43ea6")
 
-----------Functions----------
+local batData =	{
+					isOn 		= false,
+					energyOut 	= 0,
+					energyIn	= 0,
+					currCharge 	= 0,
+					maxCharge  	= 0,
+					isNew	 	= true, 	-- true when data is new (for calcData)
+					time		= ""
+				}
 
---Parsing Data from the API for the reactor
-function Power.checkStatus()
-    return reactor.producesEnergy()
+----------Main Functions----------
+
+-- to be called in slower function
+function Power.updateBatData()
+	local tmp
+	local dat = bat.getSensorInformation()
+
+	tmp = string.match(dat[3],"§a.+§r EU /")
+	tmp = string.gsub(tmp,"[§arEU/, ]","")
+	batData.currCharge = tonumber(tmp)
+
+	tmp = string.match(dat[3],"§e.+§r")
+	tmp = string.gsub(tmp,"[§er,]","")
+	batData.maxCharge = tonumber(tmp)
+
+	tmp = string.gsub(dat[5],"[EUt,/ ]","")
+	batData.energyIn = tonumber(tmp)
+
+	tmp = string.gsub(dat[7],"[EUt,/ ]","")
+	batData.energyOut = tonumber(tmp)
+
+	--Check if the buffer is out of batteries (or just really small, and never turn it on)
+	if batData.maxCharge < 10000000  then --Arbitrary number, the size of 1 battery will be more than this
+		batData.currCharge = batData.maxCharge
+	end
+
+	if batData.energyIn > 0 or reactor.producesEnergy() then
+		batData.isOn = true
+	else
+		batData.isOn = false
+	end
+
+end --end updateBatData
+
+-- to be called in faster function to update CalcData
+function Power.calcBatData()
+	if batData.isNew then
+		batData.isNew = false
+	else
+		batData.currCharge = batData.currCharge + Power.energyUsage() * 10 -- updates once every 0.5 seconds = 10 ticks
+	end
+
+	if batData.currCharge >= batData.maxCharge then
+		if reactor.producesEnergy() then
+			batData.isOn = true
+		end
+		Power.updateBatData()
+		Power.reactorPower()
+	end
+end -- end calcBatData
+
+-------- GET functions ---------
+
+function Power.isReactorOn()
+    return batData.isOn
 end --end checkStatus
 
 function Power.checkEnergy()
-    return reactor.getReactorEUOutput()
+    return batData.energyIn
 end --end checkEnergy
 
 function Power.checkHeatLevel()
     return reactor.getHeat() / reactor.getMaxHeat()
 end --end checkHeat
 
-
---Battery Buffer Calculations to get full charge (iterating through each battery until it reaches an empty slot)
 function Power.checkCurrentCharge()
-	local i = 1
-	local total = 0
-    
-	repeat
-		total = total + bat.getBatteryCharge(i)
-		i = i + 1
-	until bat.getBatteryCharge(i) == nil
-	
-	return total
+	return batData.currCharge
 end --end checkCurrentCharge
 
 function Power.checkMaxCharge()
-	local i = 1
-	local total = 0
-    
-	repeat
-		total = total + bat.getMaxBatteryCharge(i)
-		i = i + 1
-	until bat.getMaxBatteryCharge(i) == nil
-	
-	return total
+	return batData.maxCharge
 end --end checkMaxCharge
 
-
---Parsing data from the API for the GT Battery Buffer and performing calculations using above
 function Power.energyUsage()
-    return Power.checkEnergy() - bat.getEUOutputAverage()
+    return Power.checkEnergy() - batData.energyOut
 end --end energyUsage
+
+function Power.getData()
+	return batData
+end
+
+------ Calculations -------
 
 function Power.checkBatteryLevel()
 	return Power.checkCurrentCharge() / Power.checkMaxCharge()
-end
+end -- end checkBatteryLevel
 
 function Power.timeRemaining()
 	local t = 0 --placeholder for time
 	local m = 0 --calculated minutes
 	local s = 0 --caluclated seconds
 	local h = 0 --calculated hours
-	local c = Power.checkCurrentCharge()
-	local u = Power.energyUsage()
-	local f = Power.checkMaxCharge()
+	local dat = batData
+	local c = dat.currCharge
+	local u = dat.energyIn - dat.energyOut
+	local f = dat.maxCharge
 
 	if u < 0 then
 		t = math.abs(c / u) / 20 --time=(currentCharge/Usage)*coversion from ticks to seconds
@@ -94,13 +141,12 @@ function Power.timeRemaining()
 	return t
 end --end timeRemaining
 
---Event handler to power on/off the reactor
+---- Reactor control ----
 function Power.reactorPower()
-	local status = Power.checkStatus()
-	if status == false and Power.checkBatteryLevel() < 0.95 then
+	local reactorOn = Power.isReactorOn()
+	if not reactorOn and Power.checkBatteryLevel() < 1 then
 		Power.reactorOn()
-	elseif status == true and Power.checkBatteryLevel() < 0.95 then return
-	else
+	elseif reactorOn and Power.checkBatteryLevel() >= 1 then
 		Power.reactorOff()
 	end
 end --end reactorPower
@@ -114,6 +160,8 @@ function Power.reactorOn()
 	local redstoneOn  = {15, 15, 15, 15, 15, 15}
 	redstone.setOutput(redstoneOn)
 end --end reactorOn
+
+------- Energy Reserves -------
 
 function Power.checkStorage() --returns EU from durability of fuel rods in buffer chest
 	local total = 0
@@ -148,5 +196,16 @@ end --end checkStorage
 function Power.checkFuelRem() --returns a value between 1 in 100 representing fuel remaining in reactor
 	return ( 100 - chest.getStackInSlot(2,20)["damage"] ) / 100
 end --end checkFuelRem
+
+-------Helper Functions-------
+function Power.average(t)
+	local sum = 0
+	for _,v in pairs(t) do -- Get the sum of all numbers in t
+		sum = sum + v
+	end
+	return sum / #t
+end
+
+
 
 return Power

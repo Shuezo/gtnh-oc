@@ -65,7 +65,7 @@ end --end setupResolution
 function Graphic.SplashScreen(textA, textB)
 	Graphic.drawBox(COLOR.darkGrey, 1, 1, W, H)
 	Graphic.drawExit(W, 1)
-	Graphic.drawFrame(COLOR.lightGrey, COLOR.darkGrey, W/2-10, H/2-2, W/2+10, H/2+2)
+	Graphic.drawFrame(COLOR.lightGrey, COLOR.darkGrey, W/2-10, H/2-3, W/2+10, H/2+2)
 	gpu.setForeground(COLOR.green)
 	gpu.setBackground(COLOR.darkGrey)
 	gpu.set(Graphic.centerText(W/2, textA),H/2-1, textA)
@@ -138,13 +138,12 @@ end --end drawLabel
 function Graphic.updatePowerData(x, y)
 	local energy = Power.energyUsage()
 	local rem = Power.timeRemaining()
-	local status = Power.checkStatus()
 	local output = Power.checkEnergy()
 	--local heat = Power.checkHeatpercent()
 	--local storage = Power.checkStorage()
 	--local fuel = Power.checkFuelRem()
 
-	if Power.checkStatus() == true then
+	if Power.isReactorOn() == true then
 		gpu.setForeground(COLOR.green)
 		gpu.set(x,y,"ON    ")
 		gpu.setForeground(COLOR.white)
@@ -196,7 +195,7 @@ function Graphic.updatePowerBar(level, x, y, barWidth, fillColor, emptyColor)
 
 	if emptyWidth > 0 then
 		gpu.setBackground(emptyColor)
-		for pos=x+fillWidth+1,x+barWidth-1 do
+		for pos=x+fillWidth+1,x+barWidth do
 			if pos>=textX and pos<textX + string.len(percent) then
 				gpu.set(pos, y, string.sub(percent,pos-textX+1,pos-textX+1))
 			else
