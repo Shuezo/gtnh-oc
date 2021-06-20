@@ -177,6 +177,7 @@ mainThread:kill()
 slowThread:kill()
 exitThread:kill()
 dataThread:kill()
+barThread:kill()
 
 Power.reactorOff()
 Graphic.clearScreen()
