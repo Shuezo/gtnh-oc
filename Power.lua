@@ -196,7 +196,7 @@ function Power.checkStorage() --returns EU from durability of fuel rods in buffe
 end --end checkStorage
 
 function Power.checkFuelRem() --returns a value between 1 in 100 representing fuel remaining in reactor
-	return ( 100 - chest.getStackInSlot(2,20)["damage"] ) / 100
+	return ( 100 - chest.getStackInSlot(2,21)["damage"] ) / 100
 end --end checkFuelRem
 
 -------Helper Functions-------
