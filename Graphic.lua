@@ -177,10 +177,10 @@ end --end updateData
 
 ]]--
 function Graphic.updatePowerBar(level, x, y, barWidth, fillColor, emptyColor)
-	local fillWidth = math.floor(barWidth * level)
+	local fillWidth = math.ceil(barWidth * level)
 	local percent = Graphic.getPercent(level)
 	local textX = Graphic.centerText((x + barWidth)/2, percent)
-	local emptyWidth = barWidth - fillWidth - 1
+	local emptyWidth = barWidth - fillWidth
 
 	if fillWidth > 0 then
 		gpu.setBackground(fillColor)

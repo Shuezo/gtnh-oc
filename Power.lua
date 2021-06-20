@@ -32,6 +32,7 @@ function Power.updateBatData()
 	local tmp
 	local dat = bat.getSensorInformation()
 
+	batData.isNew = true
 	tmp = string.match(dat[3],"§a.+§r EU /")
 	tmp = string.gsub(tmp,"[§arEU/, ]","")
 	batData.currCharge = tonumber(tmp)
@@ -61,13 +62,14 @@ end --end updateBatData
 
 -- to be called in faster function to update CalcData
 function Power.calcBatData()
+	
 	if batData.isNew then
 		batData.isNew = false
 	else
 		batData.currCharge = batData.currCharge + Power.energyUsage() * 10 -- updates once every 0.5 seconds = 10 ticks
 	end
 
-	if batData.currCharge >= batData.maxCharge then
+	if batData.currCharge >= batData.maxCharge * 0.999 then
 		if reactor.producesEnergy() then
 			batData.isOn = true
 		end
@@ -144,9 +146,9 @@ end --end timeRemaining
 ---- Reactor control ----
 function Power.reactorPower()
 	local reactorOn = Power.isReactorOn()
-	if not reactorOn and Power.checkBatteryLevel() < 1 then
+	if not reactorOn and Power.checkBatteryLevel() < 0.995 then
 		Power.reactorOn()
-	elseif reactorOn and Power.checkBatteryLevel() >= 1 then
+	elseif reactorOn and Power.checkBatteryLevel() >= 0.999 then
 		Power.reactorOff()
 	end
 end --end reactorPower
