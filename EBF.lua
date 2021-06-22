@@ -10,6 +10,7 @@ local EBF = {}
 local component = require("component")
 local math      = require("math")
 local string    = require("string")
+local Functions = require("Functions")
 
 local controller = component.proxy("c1b4311d-993d-4d9b-8da0-71c97f8e003b")
 

@@ -10,6 +10,7 @@ local Cleanroom = {}
 local component = require("component")
 local math      = require("math")
 local string    = require("string")
+local Functions = require("Functions")
 
 local controller = component.proxy("989841fe-0184-4c2d-b793-583f0f63b8d4")
 

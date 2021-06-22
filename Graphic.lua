@@ -11,6 +11,7 @@ local component = require("component")
 local term = require("term")
 local string    = require("string")
 
+local Functions = require("Functions")
 local Power = require("Power")
 local Cleanroom = require("Cleanroom")
 local EBF = require("EBF")
@@ -29,15 +30,6 @@ COLOR = { blue 		= 0x4286F4,
 		  darkGrey 	= 0x262626 }
 
 ------------Generic Functions------------
-
-function Graphic.centerText(x, text)
-	local xLeft = math.ceil(x - string.len(text)/2)
-	return xLeft
-end --end centerText
-
-function Graphic.getPercent(val)
-    return string.format("%.2f%%", val * 100)
-end
 
 function Graphic.clearScreen()
 	gpu.setBackground(COLOR.black)
@@ -68,8 +60,8 @@ function Graphic.SplashScreen(textA, textB)
 	Graphic.drawFrame(COLOR.lightGrey, COLOR.darkGrey, W/2-10, H/2-3, W/2+10, H/2+2)
 	gpu.setForeground(COLOR.green)
 	gpu.setBackground(COLOR.darkGrey)
-	gpu.set(Graphic.centerText(W/2, textA),H/2-1, textA)
-	gpu.set(Graphic.centerText(W/2, textB),H/2, textB)
+	gpu.set(Functions.centerText(W/2, textA),H/2-1, textA)
+	gpu.set(Functions.centerText(W/2, textB),H/2, textB)
 	gpu.setForeground(COLOR.white)
 	gpu.setBackground(COLOR.black)
 end
@@ -110,7 +102,7 @@ function Graphic.drawTitle(text)
 	gpu.setBackground(COLOR.darkGrey)
 	gpu.setForeground(COLOR.darkAqua)
 	gpu.fill(1,1,W,1," ")
-	gpu.set(Graphic.centerText(W/2, text),1,text)
+	gpu.set(Functions.centerText(W/2, text),1,text)
 	gpu.setBackground(COLOR.black)
 	gpu.setForeground(COLOR.white)
 end --end drawTitle
@@ -127,44 +119,36 @@ end --end drawExit
 
 ------------Power Functions------------
 
-function Graphic.drawPowerLabel(x, y)
-	gpu.set(x,y,"Reactor Status")
-	y=y+1
-	gpu.set(x,y,"Reactor Output")
-	y=y+2
-	gpu.set(x,y,"Power Usage")
-end --end drawLabel
-
-function Graphic.updatePowerData(x, y)
+function Graphic.updatePowerData()
 	local energy = Power.energyUsage()
 	local rem = Power.timeRemaining()
 	local output = Power.checkEnergy()
+	local status = Power.isReactorOn()
 	--local heat = Power.checkHeatpercent()
 	--local storage = Power.checkStorage()
 	--local fuel = Power.checkFuelRem()
 
-	if Power.isReactorOn() == true then
+	gpu.set(8,H-5, "Reactor is ")
+	if status == true then
 		gpu.setForeground(COLOR.green)
-		gpu.set(x,y,"ON    ")
+		gpu.set(19,H-5,"ON ")
 		gpu.setForeground(COLOR.white)
-		gpu.set(x+20,y,rem)
+		Graphic.drawBox(COLOR.green, 3, H-5, 6, H-4)
 	else
 		gpu.setForeground(COLOR.red)
-		gpu.set(x,y,"OFF    ")
+		gpu.set(19,H-5,"OFF")
 		gpu.setForeground(COLOR.white)
-		gpu.fill(x+20,y,20,1," ")
+		Graphic.drawBox(COLOR.red, 3, H-5, 6, H-4)
 	end
-		y=y+1
-		
-	gpu.set(x,y, string.format("%.0f EU/t    ", output))
-		y=y+1
-		y=y+1
-	
-	if energy > 0 then gpu.set(x,y,string.format("+%.0f EU/t    ", energy)) else gpu.set(x,y,string.format("%.0f EU/t    ", energy)) end
-	--gpu.set(10,H-4, string.format(fuel.." Fuel Remaining"))
-	--gpu.set(W-26,H-4, string.format(storage.." in buffer"))
+			
+	gpu.set(8,H-4, string.format("Output: %.0f EU/t    ", output))
+	--if energy > 0 then gpu.set(55,H-4,string.format("Net: +%.0f EU/t    ", energy)) else gpu.set(x,y,string.format("Net: %.0f EU/t    ", energy)) end
 
-	--Graphic.updatePowerBar() --updates power bar on tick
+	gpu.setBackground(COLOR.darkGrey)
+	--gpu.setForeground(COLOR.white)
+	gpu.set(4,H-2,"Battery Buffer: " .. rem)
+
+	gpu.setBackground(COLOR.black)
 end --end updateData
 
 
@@ -178,8 +162,8 @@ end --end updateData
 ]]--
 function Graphic.updatePowerBar(level, x, y, barWidth, fillColor, emptyColor)
 	local fillWidth = math.ceil(barWidth * level)
-	local percent = Graphic.getPercent(level)
-	local textX = Graphic.centerText((x + barWidth)/2, percent)
+	local percent = Functions.getPercent(level)
+	local textX = Functions.centerText((x + barWidth)/2, percent)
 	local emptyWidth = barWidth - fillWidth
 
 	if fillWidth > 0 then

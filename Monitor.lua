@@ -6,6 +6,7 @@ Usage: To be used in conjunction with Power.lua and Graphic.lua and Cleanroom.lu
 ]]--
 package.loaded.Power = nil  --Free memory
 package.loaded.Monitor = nil
+package.loaded.Functions = nil
 package.loaded.Graphic = nil
 package.loaded.Cleanroom = nil
 package.loaded.EBF = nil
@@ -15,6 +16,7 @@ local event = require("event")
 local keyboard = require("keyboard")
 local thread = require("thread")
 local component = require("component")
+local Functions = require("Functions")
 local Power = require("Power")
 local Graphic = require("Graphic")
 
@@ -67,7 +69,7 @@ end
 
 local function mainFunction()
     Power.reactorPower()
-    Graphic.updatePowerData(30, 3)
+    Graphic.updatePowerData()
     Graphic.updateCleanroomStatus(10, 9)
     Graphic.updateEBFStatus(50, 9)
     
@@ -85,7 +87,7 @@ local function barFunction()
     local bat = Power.checkBatteryLevel()
     local fuel = Power.checkFuelRem()
     Graphic.updatePowerBar(bat, 3, H-1, W-5, COLOR.green, COLOR.red)
-    Graphic.updatePowerBar(fuel, 3, H-2, W-5, COLOR.blue, COLOR.purple)
+    --Graphic.updatePowerBar(fuel, 3, H-2, W-5, COLOR.blue, COLOR.purple)
 end
 
 ------------Main------------
@@ -101,8 +103,7 @@ gpu.setActiveBuffer(buf)
 
 Graphic.clearScreen()
 Graphic.drawTitle(title) --draw title bar
-Graphic.drawBox(COLOR.darkGrey,1,H-3,W,H) --draw background for power bars
-Graphic.drawPowerLabel(10, 3) -- draw plain text labels for status, usage, etc.
+Graphic.drawBox(COLOR.darkGrey,1,H-2,W,H) --draw background for power bars
 Graphic.drawExit(W, 1) --draw exit button
 slowFunction()
 calcDataFunction()

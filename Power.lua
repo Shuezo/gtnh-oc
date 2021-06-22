@@ -9,6 +9,7 @@ local Power = {}
 
 local component = require("component")
 local math      = require("math")
+local Functions = require("Functions")
 
 local reactor  = component.proxy("de831599-fabb-44a5-ac3c-4ac71a2f16f5")
 local chest    = component.proxy("fa458337-2bdd-4161-94f1-c126ce8571ef")
@@ -115,7 +116,7 @@ function Power.checkBatteryLevel()
 end -- end checkBatteryLevel
 
 function Power.timeRemaining()
-	local t = 0 --placeholder for time
+	local t = 0 --initialized time
 	local m = 0 --calculated minutes
 	local s = 0 --caluclated seconds
 	local h = 0 --calculated hours
@@ -129,9 +130,9 @@ function Power.timeRemaining()
 		s = t % 60
 		m = (t % 3600) / 60
 		h = t / 3600
-		t = string.format("%.0fh %.0fm %.0fs to empty   ", h, m, s)
+		t = string.format("%.0fh %.0fm %.0fs to empty  ", h, m, s)
 	elseif u == 0 then
-		t = "N/A                          "
+		t = "No load                          "
 	else
 		t = (f - c) / u / 20 --time=(maxCharge-currentCharge/Usage)*conversion from ticks to seconds
 		s = t % 60
@@ -198,16 +199,6 @@ end --end checkStorage
 function Power.checkFuelRem() --returns a value between 1 in 100 representing fuel remaining in reactor
 	return ( 100 - chest.getStackInSlot(2,21)["damage"] ) / 100
 end --end checkFuelRem
-
--------Helper Functions-------
-function Power.average(t)
-	local sum = 0
-	for _,v in pairs(t) do -- Get the sum of all numbers in t
-		sum = sum + v
-	end
-	return sum / #t
-end
-
 
 
 return Power
