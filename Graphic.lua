@@ -13,8 +13,10 @@ local string    = require("string")
 
 local Functions = require("Functions")
 local Power = require("Power")
-local Cleanroom = require("Cleanroom")
-local EBF = require("EBF")
+local GtMachine = require("GtMachine")
+
+local Cleanroom = GtMachine:new("989841fe-0184-4c2d-b793-583f0f63b8d4")
+local EBF = GtMachine:new("c1b4311d-993d-4d9b-8da0-71c97f8e003b")
 
 local gpu = component.gpu
 
@@ -194,12 +196,12 @@ end --end UpdatePowerBar
 ------------Cleanroom Functions------------
 
 function Graphic.updateCleanroomStatus(x, y)
-	if Cleanroom.getProblems() == '0' and Cleanroom.status() == true then
+	if Cleanroom:getProblems() == '0' and Cleanroom:status() == true then
 		gpu.set(x,y,"Cleanroom is ")
 		gpu.setForeground(COLOR.green)
 		gpu.set(x,y+1,"     OK      ")
 		gpu.setForeground(COLOR.white)
-	elseif Cleanroom.getProblems() == '0' and Cleanroom.status() == false then
+	elseif Cleanroom:getProblems() == '0' and Cleanroom:status() == false then
 		gpu.set(x,y,"Cleanroom is ")
 		gpu.setForeground(COLOR.red)
 		gpu.set(x,y+1,"  Inactive!  ")
@@ -215,16 +217,16 @@ end --end drawLabel
 ------------EBF Functions------------
 
 function Graphic.updateEBFStatus(x, y)
-	if EBF.getProblems() ~= '0' then
+	if EBF:getProblems() ~= '0' then
 		gpu.set(x,y,"    EBF has    ")
 		gpu.setForeground(COLOR.red)
 		gpu.set(x,y+1,"   Problems!   ")
 		gpu.setForeground(COLOR.white)
 		return
 	else
-		if EBF.status() == true then
+		if EBF:status() == true then
 			local tally = 0
-			local task = EBF.craftingStatus()
+			local task = EBF:craftingStatus()
 			gpu.set(x+1,y,"EBF Active: ")
 			gpu.set(x,y+1,task)
 		else

@@ -10,11 +10,13 @@ local Power = {}
 local component = require("component")
 local math      = require("math")
 local Functions = require("Functions")
+local GtMachine = require("GtMachine")
 
 local reactor  = component.proxy("de831599-fabb-44a5-ac3c-4ac71a2f16f5")
 local chest    = component.proxy("fa458337-2bdd-4161-94f1-c126ce8571ef")
-local bat      = component.proxy("e4ecc183-dfe1-4fd0-a68f-56589d54902b")
 local redstone = component.proxy("3c96c747-346c-422d-bae0-bc1918f43ea6")
+
+local bat = GtMachine:new("e4ecc183-dfe1-4fd0-a68f-56589d54902b")
 
 local batData =	{
 					isOn 		= false,
@@ -30,23 +32,12 @@ local batData =	{
 
 -- to be called in slower function
 function Power.updateBatData()
-	local tmp
-	local dat = bat.getSensorInformation()
+	local c, m, i, o = bat:sensorInfo({3,"a"}, {3,"e"}, {5}, {7})
 
-	batData.isNew = true
-	tmp = string.match(dat[3],"§a.-§r")
-	tmp = string.gsub(tmp,"[§ar,]","")
-	batData.currCharge = tonumber(tmp)
-
-	tmp = string.match(dat[3],"§e.-§r")
-	tmp = string.gsub(tmp,"[§er,]","")
-	batData.maxCharge = tonumber(tmp)
-
-	tmp = string.gsub(dat[5],"[EUt,/ ]","")
-	batData.energyIn = tonumber(tmp)
-
-	tmp = string.gsub(dat[7],"[EUt,/ ]","")
-	batData.energyOut = tonumber(tmp)
+	batData.currCharge 	= c
+	batData.maxCharge 	= m
+	batData.energyIn	= i
+	batData.energyOut 	= o
 
 	--Check if the buffer is out of batteries (or just really small, and never turn it on)
 	if batData.maxCharge < 10000000  then --Arbitrary number, the size of 1 battery will be more than this

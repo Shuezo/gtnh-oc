@@ -8,8 +8,7 @@ package.loaded.Power = nil  --Free memory
 package.loaded.Monitor = nil
 package.loaded.Functions = nil
 package.loaded.Graphic = nil
-package.loaded.Cleanroom = nil
-package.loaded.EBF = nil
+package.loaded.GtMachine = nil
 
 ------------Initilized Values------------
 local event = require("event")
@@ -111,6 +110,7 @@ mainFunction()
 barFunction()
 
 os.sleep(0.5)
+
 --load buffer onto screen
 gpu.bitblt(0, 1, 1, W, H, buf, 1, 1)
 gpu.freeBuffer(buf)
