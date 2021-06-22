@@ -34,11 +34,11 @@ function Power.updateBatData()
 	local dat = bat.getSensorInformation()
 
 	batData.isNew = true
-	tmp = string.match(dat[3],"§a.+§r EU /")
-	tmp = string.gsub(tmp,"[§arEU/, ]","")
+	tmp = string.match(dat[3],"§a.-§r")
+	tmp = string.gsub(tmp,"[§ar,]","")
 	batData.currCharge = tonumber(tmp)
 
-	tmp = string.match(dat[3],"§e.+§r")
+	tmp = string.match(dat[3],"§e.-§r")
 	tmp = string.gsub(tmp,"[§er,]","")
 	batData.maxCharge = tonumber(tmp)
 
