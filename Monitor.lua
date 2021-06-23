@@ -21,12 +21,6 @@ local Graphic = require("Graphic")
 
 local gpu = component.gpu
 
-local mainThread
-local slowThread
-local exitThread
-local dataThread
-local barThread
-
 local threads = {}
 
 local timer10
@@ -42,7 +36,7 @@ local title = "MONITORING SYSTEM"
 
 ----------Thread Functions----------
 
-local function update(thr)
+local function resume(thr)
     return function () 
         if thr:status() == "suspended" then
             thr:resume()
@@ -52,33 +46,46 @@ end
 
 local function createThreads(...)
     for i,updateFunc in ipairs({...}) do
-        threads{updateFunc = thread.create(function ()
+        threads[updateFunc] = thread.create(function ()
             while true do
                 updateFunc()
                 thread.current():suspend()
             end
-        end)}
+        end)
     end
 end
 
+threads["exit"] = thread.create(function ()
+    local id, x, y
+    while true do --loop until x is touched
+        id, _, x, y = event.pullMultiple("touch", "interrupted")
+        if id == "interrupted" then
+            break
+        elseif id == "touch" then
+            if x == W and y == 1 then
+                break
+            end
+        end
+    end
+end)
+
 ---------Main Functions---------
 
-local function mainFunction()
+local function mainUpdate()
     Power.reactorPower()
     Graphic.updateCleanroomStatus(4, 3)
     Graphic.updateEBFStatus(4, 7)
-    
 end
 
-local function slowFunction()
+local function slowUpdate()
     Power.updateBatData()
 end
 
-local function calcDataFunction()
+local function updateData()
     Power.calcBatData()
 end
 
-local function barFunction()
+local function updateBars()
     local bat = Power.checkBatteryLevel()
     local fuel = Power.checkFuelRem()
     Graphic.updatePowerData()
@@ -101,10 +108,11 @@ Graphic.clearScreen()
 Graphic.drawTitle(title) --draw title bar
 Graphic.drawBox(COLOR.darkGrey,1,H-2,W,H) --draw background for power bars
 Graphic.drawExit(W, 1) --draw exit button
-slowFunction()
-calcDataFunction()
-mainFunction()
-barFunction()
+
+createThreads(slowUpdate, 
+              updateData, 
+              mainUpdate,
+              updateBars)
 
 os.sleep(0.5)
 
@@ -112,57 +120,11 @@ os.sleep(0.5)
 gpu.bitblt(0, 1, 1, W, H, buf, 1, 1)
 gpu.freeBuffer(buf)
 
-----------------Threads----------------
-
-exitThread = thread.create(function ()
-    local id, x, y
-    while true do --loop until x is touched
-        id, _, x, y = event.pullMultiple("touch", "interrupted")
-        if id == "interrupted" then
-            break
-        elseif id == "touch" then
-            if x == W and y == 1 then
-                break
-            end
-        end
-    end
-end)
-
-createThreads(mainFunction)
-
-mainThread = thread.create(function ()
-    while true do
-        mainFunction()
-        thread.current():suspend()
-    end
-end)
-
-slowThread = thread.create(function ()
-    while true do
-        slowFunction()
-        thread.current():suspend()
-    end
-end)
-
-dataThread = thread.create(function ()
-    while true do
-        calcDataFunction()
-        thread.current():suspend()
-    end
-end)
-
-barThread = thread.create(function ()
-    while true do
-        barFunction()
-        thread.current():suspend()
-    end
-end)
-
 --start timers/listeners
-timer10     = event.timer(8,    update(slowThread), math.huge)
-timer2      = event.timer(2,    update(mainThread), math.huge)
-dataTimer   = event.timer(0.5,  update(dataThread), math.huge)
-barTimer    = event.timer(0.5,  update(barThread),  math.huge)
+timer10     = event.timer(8,    resume(threads[slowUpdate]),    math.huge)
+timer2      = event.timer(2,    resume(threads[mainUpdate]),    math.huge)
+dataTimer   = event.timer(0.5,  resume(threads[updateData]),    math.huge)
+barTimer    = event.timer(0.5,  resume(threads[updateBars]),    math.huge)
 
 thread.waitForAny({exitThread})
 
@@ -173,11 +135,7 @@ event.cancel(timer2)
 event.cancel(dataTimer)
 event.cancel(barTimer)
 
-mainThread:kill()
-slowThread:kill()
-exitThread:kill()
-dataThread:kill()
-barThread:kill()
+
 
 Power.reactorOff()
 Graphic.clearScreen()
