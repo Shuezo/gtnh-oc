@@ -39,6 +39,7 @@ local locked = false
 ------------Variables------------
 
 local title = "MONITORING SYSTEM"
+local quickBoot = false --setting this value to true disables splashscreen and gpu buffer
 
 ----------Thread Functions----------
 
@@ -63,54 +64,56 @@ end
 
 ---------Main Functions---------
 
+local function startupFunction()
+	Graphic.clearScreen()
+	Graphic.drawTitle(title) --draw title bar
+	Graphic.drawBox(COLOR.darkGrey,1,H-2,W,H) --draw background for power bars
+	Graphic.drawExit(W, 1) --draw exit button
+	slowFunction()
+	calcDataFunction()
+	mainFunction()
+	barFunction()
+end --end startupFunction
+
 local function mainFunction()
     Power.reactorPower()
     Graphic.updateCleanroomStatus(4, 3)
     Graphic.updateEBFStatus(4, 7)
-    
-end
+end --end mainFunction
 
 local function slowFunction()
     Power.updateBatData()
-end
+end --end slowFunction
 
 local function calcDataFunction()
     Power.calcBatData()
-end
+end --end calcDataFunction
 
 local function barFunction()
     local bat = Power.checkBatteryLevel()
     local fuel = Power.checkFuelRem()
     Graphic.updatePowerData()
-    Graphic.updatePowerBar(bat, 3, H-1, W-5, COLOR.green, COLOR.red)
+    Graphic.updatePowerBar(bat, 3, H-1, W-5, COLOR.green, COLOR.red) --draw powerbar
     --Graphic.updatePowerBar(fuel, 3, H-2, W-5, COLOR.blue, COLOR.purple)
-end
+end --end barFunction
 
-------------Main------------
+----------------Main----------------
 
---setup screen
 Graphic.setupResolution() --initial screen setup (hardware)
 Graphic.clearScreen()
-Graphic.SplashScreen("Initializing...", "Please Wait")
-
---buffer
-local buf = gpu.allocateBuffer(W,H)
-gpu.setActiveBuffer(buf)
-
-Graphic.clearScreen()
-Graphic.drawTitle(title) --draw title bar
-Graphic.drawBox(COLOR.darkGrey,1,H-2,W,H) --draw background for power bars
-Graphic.drawExit(W, 1) --draw exit button
-slowFunction()
-calcDataFunction()
-mainFunction()
-barFunction()
-
-os.sleep(0.5)
-
---load buffer onto screen
-gpu.bitblt(0, 1, 1, W, H, buf, 1, 1)
-gpu.freeBuffer(buf)
+	if quickBoot == false then
+		Graphic.SplashScreen("Initializing...", "Please Wait")
+		local buf = gpu.allocateBuffer(W,H)
+		gpu.setActiveBuffer(buf)
+		
+		startupFunction()
+		os.sleep(0.5)
+		
+		gpu.bitblt(0, 1, 1, W, H, buf, 1, 1) --load buffer onto screen
+		gpu.freeBuffer(buf)
+	else
+		startupFunction()
+	end --end Main
 
 ----------------Threads----------------
 
