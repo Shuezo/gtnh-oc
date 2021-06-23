@@ -68,9 +68,8 @@ end
 
 local function mainFunction()
     Power.reactorPower()
-    Graphic.updatePowerData()
-    Graphic.updateCleanroomStatus(10, 9)
-    Graphic.updateEBFStatus(50, 9)
+    Graphic.updateCleanroomStatus(4, 3)
+    Graphic.updateEBFStatus(4, 7)
     
 end
 
@@ -85,6 +84,7 @@ end
 local function barFunction()
     local bat = Power.checkBatteryLevel()
     local fuel = Power.checkFuelRem()
+    Graphic.updatePowerData()
     Graphic.updatePowerBar(bat, 3, H-1, W-5, COLOR.green, COLOR.red)
     --Graphic.updatePowerBar(fuel, 3, H-2, W-5, COLOR.blue, COLOR.purple)
 end
@@ -160,7 +160,7 @@ barThread = thread.create(function ()
 end)
 
 --start timers/listeners
-timer10     = event.timer(10, slowUpdate, math.huge)
+timer10     = event.timer(8, slowUpdate, math.huge)
 timer2      = event.timer(2, mainUpdate, math.huge)
 dataTimer   = event.timer(0.5, dataUpdate, math.huge)
 barTimer    = event.timer(0.5, barUpdate, math.huge)

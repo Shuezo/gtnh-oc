@@ -24,7 +24,7 @@ local batData =	{
 					energyIn	= 0,
 					currCharge 	= 0,
 					maxCharge  	= 0,
-					isNew	 	= true, 	-- true when data is new (for calcData)
+					ref	 		= {0,0}, 	-- 1st is current, 2nd is also current (unless changed)
 					time		= ""
 				}
 
@@ -33,42 +33,63 @@ local batData =	{
 -- to be called in slower function
 function Power.updateBatData()
 	local c, m, i, o = bat:sensorInfo({3,"a"}, {3,"e"}, {5}, {7})
+	local tmpData = batData
 
-	batData.currCharge 	= c
-	batData.maxCharge 	= m
-	batData.energyIn	= i
-	batData.energyOut 	= o
+	tmpData.currCharge 	= c
+	tmpData.maxCharge 	= m
+	tmpData.energyIn	= i
+	tmpData.energyOut 	= o
+	tmpData.ref[1]		= c
 
 	--Check if the buffer is out of batteries (or just really small, and never turn it on)
-	if batData.maxCharge < 10000000  then --Arbitrary number, the size of 1 battery will be more than this
-		batData.currCharge = batData.maxCharge
+	if tmpData.maxCharge < 10000000  then --Arbitrary number, the size of 1 battery will be more than this
+		tmpData.currCharge = tmpData.maxCharge
 	end
 
-	if batData.energyIn > 0 or reactor.producesEnergy() then
-		batData.isOn = true
+	if tmpData.energyIn > 0 or reactor.producesEnergy() then
+		tmpData.isOn = true
 	else
-		batData.isOn = false
+		tmpData.isOn = false
 	end
+
+	batData = tmpData
 
 end --end updateBatData
 
 -- to be called in faster function to update CalcData
 function Power.calcBatData()
+	local tmpData = batData
 	
-	if batData.isNew then
-		batData.isNew = false
+	if tmpData.ref[1] ~= tmpData.ref[2] then
+		tmpData.ref[2] = tmpData.ref[1]
+		tmpData.currCharge = tmpData.ref[1]
 	else
-		batData.currCharge = batData.currCharge + Power.energyUsage() * 10 -- updates once every 0.5 seconds = 10 ticks
+		tmpData.currCharge = tmpData.currCharge + (tmpData.energyIn - tmpData.energyOut) * 10 -- updates once every 0.5 seconds = 10 ticks
 	end
 
-	if batData.currCharge >= batData.maxCharge * 0.999 then
-		if reactor.producesEnergy() then
-			batData.isOn = true
+	if tmpData.currCharge >= tmpData.maxCharge * 0.99 then
+		if reactor.producesEnergy() then -- probably becomes a bit laggy, only really need to check if in manual mode
+			tmpData.isOn = true
+		else
+			tmpData.isOn = false
 		end
+
+		Power.saveRef(tmpData)
 		Power.updateBatData()
-		Power.reactorPower()
+		Power.reactorPower() --if in manual mode, don't do this
+	else
+		Power.saveRef(tmpData)
 	end
+
+	Power.timeRemaining()
+
 end -- end calcBatData
+
+function Power.saveRef(dat)
+	local ref = batData.ref[1]
+	batData = dat
+	batData.ref[2] = ref -- ref[1] saved to ref[2]
+end
 
 -------- GET functions ---------
 
@@ -121,7 +142,7 @@ function Power.timeRemaining()
 		s = t % 60
 		m = (t % 3600) / 60
 		h = t / 3600
-		t = string.format("%.0fh %.0fm %.0fs to empty  ", h, m, s)
+		t = string.format("%.0fh %.0fm %.0fs to empty", h, m, s)
 	elseif u == 0 then
 		t = "No load                          "
 	else
@@ -129,18 +150,19 @@ function Power.timeRemaining()
 		s = t % 60
 		m = (t % 3600) / 60
 		h = t / 3600
-		t = string.format("%.0fh %.0fm %.0fs to full   ", h, m, s)
+		t = string.format("%.0fh %.0fm %.0fs to full ", h, m, s)
 	end
 
-	return t
+	batData.time = t
+	
 end --end timeRemaining
 
 ---- Reactor control ----
 function Power.reactorPower()
-	local reactorOn = Power.isReactorOn()
-	if not reactorOn and Power.checkBatteryLevel() < 0.995 then
+	local reactorOn = batData.isOn
+	if not reactorOn and Power.checkBatteryLevel() < 0.9 then
 		Power.reactorOn()
-	elseif reactorOn and Power.checkBatteryLevel() >= 0.999 then
+	elseif reactorOn and Power.checkBatteryLevel() >= 0.99 then
 		Power.reactorOff()
 	end
 end --end reactorPower
@@ -148,11 +170,13 @@ end --end reactorPower
 function Power.reactorOff()
 	local redstoneOff = { 0,  0,  0,  0,  0,  0}
 	redstone.setOutput(redstoneOff)
+	batData.isOn = false
 end --end reactorOff
 
 function Power.reactorOn()
 	local redstoneOn  = {15, 15, 15, 15, 15, 15}
 	redstone.setOutput(redstoneOn)
+	batData.isOn = true
 end --end reactorOn
 
 ------- Energy Reserves -------

@@ -92,11 +92,13 @@ function Graphic.drawFrame(clr, fill, x1, y1, x2, y2)
 end --end drawFrame
 
 function Graphic.drawBox(clr, x1, y1, x2, y2)
-	local barWidth = x2 - x1 + 1
-	local height = y2 - y1 + 1
-	local bg = gpu.setBackground(clr)
+	local barWidth = math.abs(x2 - x1) + 1
+	local height = math.abs(y2 - y1) + 1
+	local bg = gpu.getBackground()
 
+	gpu.setBackground(clr)
 	gpu.fill(x1, y1, barWidth, height, " ")
+	
 	gpu.setBackground(bg)
 end --end drawBox
 
@@ -122,10 +124,13 @@ end --end drawExit
 ------------Power Functions------------
 
 function Graphic.updatePowerData()
-	local energy = Power.energyUsage()
-	local rem = Power.timeRemaining()
-	local output = Power.checkEnergy()
-	local status = Power.isReactorOn()
+	local batData 	= Power.getData()
+	
+	local energy 	= batData.energyIn - batData.energyOut
+	local rem 		= batData.time
+	local output 	= batData.energyIn
+	local status 	= batData.isOn
+
 	--local heat = Power.checkHeatpercent()
 	--local storage = Power.checkStorage()
 	--local fuel = Power.checkFuelRem()
@@ -196,44 +201,49 @@ end --end UpdatePowerBar
 ------------Cleanroom Functions------------
 
 function Graphic.updateCleanroomStatus(x, y)
+	gpu.setBackground(COLOR.darkGrey)
+	gpu.setForeground(COLOR.darkAqua)
+	gpu.set(x,y," Cleanroom ")
+	gpu.setForeground(COLOR.white)
+	gpu.set(x,y+1,"  Status:  ")
 	if Cleanroom:getProblems() == '0' and Cleanroom:status() == true then
-		gpu.set(x,y,"Cleanroom is ")
 		gpu.setForeground(COLOR.green)
-		gpu.set(x,y+1,"     OK      ")
-		gpu.setForeground(COLOR.white)
+		gpu.set(x,y+2,"    OK     ")
 	elseif Cleanroom:getProblems() == '0' and Cleanroom:status() == false then
-		gpu.set(x,y,"Cleanroom is ")
 		gpu.setForeground(COLOR.red)
-		gpu.set(x,y+1,"  Inactive!  ")
-		gpu.setForeground(COLOR.white)
+		gpu.set(x,y+1," Inactive! ")
 	else
-		gpu.set(x,y,"Cleanroom has")
 		gpu.setForeground(COLOR.red)
-		gpu.set(x,y+1,"  Problems!  ")
-		gpu.setForeground(COLOR.white)
+		gpu.set(x,y+1," Problems! ")
 	end
+	gpu.setForeground(COLOR.white)
+	gpu.setBackground(COLOR.black)
 end --end drawLabel
 
 ------------EBF Functions------------
 
 function Graphic.updateEBFStatus(x, y)
+	gpu.setBackground(COLOR.darkGrey)
+	gpu.setForeground(COLOR.darkAqua)
+	gpu.set(x,y,"    EBF    ")
+	gpu.setForeground(COLOR.white)
 	if EBF:getProblems() ~= '0' then
-		gpu.set(x,y,"    EBF has    ")
 		gpu.setForeground(COLOR.red)
-		gpu.set(x,y+1,"   Problems!   ")
-		gpu.setForeground(COLOR.white)
+		gpu.set(x,y+1," Problems! ")
 		return
 	else
 		if EBF:status() == true then
 			local tally = 0
 			local task = EBF:craftingStatus()
-			gpu.set(x+1,y,"EBF Active: ")
-			gpu.set(x,y+1,task)
+			gpu.set(x,y+1,"  Active:  ")
+			gpu.set(x,y+2,task)
 		else
-			gpu.set(x,y,"    EBF is     ")
-			gpu.set(x,y+1,"   Inactive    ")
+			gpu.set(x,y+1," Inactive. ")
+			gpu.set(x,y+2,"           ")
 		end
-	end		
+	end
+	gpu.setForeground(COLOR.white)
+	gpu.setBackground(COLOR.black)
 end
 
 return Graphic
