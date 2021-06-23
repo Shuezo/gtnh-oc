@@ -142,7 +142,7 @@ function Power.timeRemaining()
 		s = t % 60
 		m = (t % 3600) / 60
 		h = t / 3600
-		t = string.format("%.0fh %.0fm %.0fs to empty", h, m, s)
+		t = string.format("%.0fh %.0fm %.0fs to empty   ", h, m, s)
 	elseif u == 0 then
 		t = "No load                          "
 	else
@@ -150,7 +150,7 @@ function Power.timeRemaining()
 		s = t % 60
 		m = (t % 3600) / 60
 		h = t / 3600
-		t = string.format("%.0fh %.0fm %.0fs to full ", h, m, s)
+		t = string.format("%.0fh %.0fm %.0fs to full    ", h, m, s)
 	end
 
 	batData.time = t
