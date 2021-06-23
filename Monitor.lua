@@ -33,6 +33,7 @@ local locked = false
 ------------Variables------------
 
 local title = "MONITORING SYSTEM"
+local quickBoot = false --setting this value to true disables splashscreen and gpu buffer
 
 ----------Thread Functions----------
 
@@ -52,6 +53,12 @@ local function createThreads(...)
                 thread.current():suspend()
             end
         end)
+    end
+end
+
+local function killThreads(tbl)
+    for key, thr in pairs(tbl) do
+        thr:kill()
     end
 end
 
@@ -79,46 +86,49 @@ end
 
 local function slowUpdate()
     Power.updateBatData()
-end
+end --end slowFunction
 
 local function updateData()
     Power.calcBatData()
-end
+end --end calcDataFunction
 
 local function updateBars()
     local bat = Power.checkBatteryLevel()
     local fuel = Power.checkFuelRem()
     Graphic.updatePowerData()
-    Graphic.updatePowerBar(bat, 3, H-1, W-5, COLOR.green, COLOR.red)
+    Graphic.updatePowerBar(bat, 3, H-1, W-5, COLOR.green, COLOR.red) --draw powerbar
     --Graphic.updatePowerBar(fuel, 3, H-2, W-5, COLOR.blue, COLOR.purple)
-end
+end --end barFunction
 
-------------Main------------
+local function startupFunction()
+	Graphic.clearScreen()
+	Graphic.drawTitle(title) --draw title bar
+	Graphic.drawBox(COLOR.darkGrey,1,H-2,W,H) --draw background for power bars
+	Graphic.drawExit(W, 1) --draw exit button
+	createThreads(mainUpdate,
+                  slowUpdate,
+                  updateData,
+                  updateBars)
+end --end startupFunction
 
---setup screen
+----------------Main----------------
+
 Graphic.setupResolution() --initial screen setup (hardware)
 Graphic.clearScreen()
-Graphic.SplashScreen("Initializing...", "Please Wait")
 
---buffer
-local buf = gpu.allocateBuffer(W,H)
-gpu.setActiveBuffer(buf)
-
-Graphic.clearScreen()
-Graphic.drawTitle(title) --draw title bar
-Graphic.drawBox(COLOR.darkGrey,1,H-2,W,H) --draw background for power bars
-Graphic.drawExit(W, 1) --draw exit button
-
-createThreads(slowUpdate, 
-              updateData, 
-              mainUpdate,
-              updateBars)
-
-os.sleep(0.5)
-
---load buffer onto screen
-gpu.bitblt(0, 1, 1, W, H, buf, 1, 1)
-gpu.freeBuffer(buf)
+if quickBoot == false then
+    Graphic.SplashScreen("Initializing...", "Please Wait")
+    local buf = gpu.allocateBuffer(W,H)
+    gpu.setActiveBuffer(buf)
+    
+    startupFunction()
+    os.sleep(0.5)
+    
+    gpu.bitblt(0, 1, 1, W, H, buf, 1, 1) --load buffer onto screen
+    gpu.freeBuffer(buf)
+else
+    startupFunction()
+end --end Main
 
 --start timers/listeners
 timer10     = event.timer(8,    resume(threads[slowUpdate]),    math.huge)
@@ -126,7 +136,7 @@ timer2      = event.timer(2,    resume(threads[mainUpdate]),    math.huge)
 dataTimer   = event.timer(0.5,  resume(threads[updateData]),    math.huge)
 barTimer    = event.timer(0.5,  resume(threads[updateBars]),    math.huge)
 
-thread.waitForAny({exitThread})
+thread.waitForAny({threads["exit"]})
 
 -----Exit-----
 
@@ -135,7 +145,7 @@ event.cancel(timer2)
 event.cancel(dataTimer)
 event.cancel(barTimer)
 
-
+killThreads(threads)
 
 Power.reactorOff()
 Graphic.clearScreen()
