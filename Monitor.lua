@@ -22,11 +22,7 @@ local Graphic = require("Graphic")
 local gpu = component.gpu
 
 local threads = {}
-
-local timer10
-local timer2
-local dataTimer
-local barTimer
+local timers = {}
 
 local locked = false
 
@@ -35,7 +31,7 @@ local locked = false
 local title = "MONITORING SYSTEM"
 local quickBoot = false --setting this value to true disables splashscreen and gpu buffer
 
-----------Thread Functions----------
+----------Thread/Timer Functions----------
 
 local function resume(thr)
     return function () 
@@ -59,6 +55,12 @@ end
 local function killThreads(tbl)
     for key, thr in pairs(tbl) do
         thr:kill()
+    end
+end
+
+local function stopTimers(tbl)
+    for key, timer in pairs(tbl) do
+        event.cancel(timer)
     end
 end
 
@@ -122,7 +124,8 @@ if quickBoot == false then
     gpu.setActiveBuffer(buf)
     
     startupFunction()
-    os.sleep(0.5)
+    os.sleep(0.25)
+    thread.waitForAll(threads)
     
     gpu.bitblt(0, 1, 1, W, H, buf, 1, 1) --load buffer onto screen
     gpu.freeBuffer(buf)
@@ -131,20 +134,16 @@ else
 end --end Main
 
 --start timers/listeners
-timer10     = event.timer(8,    resume(threads[slowUpdate]),    math.huge)
-timer2      = event.timer(2,    resume(threads[mainUpdate]),    math.huge)
-dataTimer   = event.timer(0.5,  resume(threads[updateData]),    math.huge)
-barTimer    = event.timer(0.5,  resume(threads[updateBars]),    math.huge)
+timers[slowUpdate]  = event.timer(8,    resume(threads[slowUpdate]),    math.huge)
+timers[mainUpdate]  = event.timer(2,    resume(threads[mainUpdate]),    math.huge)
+timers[updateData]  = event.timer(0.5,  resume(threads[updateData]),    math.huge)
+timers[updateBars]  = event.timer(0.5,  resume(threads[updateBars]),    math.huge)
 
 thread.waitForAny({threads["exit"]})
 
 -----Exit-----
 
-event.cancel(timer10)
-event.cancel(timer2)
-event.cancel(dataTimer)
-event.cancel(barTimer)
-
+stopTimers(timers)
 killThreads(threads)
 
 Power.reactorOff()
