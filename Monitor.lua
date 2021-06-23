@@ -27,6 +27,8 @@ local exitThread
 local dataThread
 local barThread
 
+local threads = {}
+
 local timer10
 local timer2
 local dataTimer
@@ -40,27 +42,22 @@ local title = "MONITORING SYSTEM"
 
 ----------Thread Functions----------
 
-local function mainUpdate(e)
-    if mainThread:status() == "suspended" then
-        mainThread:resume()
+local function update(thr)
+    return function () 
+        if thr:status() == "suspended" then
+            thr:resume()
+        end
     end
 end
 
-local function slowUpdate(e)
-    if slowThread:status() == "suspended" then
-        slowThread:resume()
-    end
-end
-
-local function dataUpdate(e)
-    if dataThread:status() == "suspended" then
-        dataThread:resume()
-    end
-end
-
-local function barUpdate(e)
-    if barThread:status() == "suspended" then
-        barThread:resume()
+local function createThreads(...)
+    for i,updateFunc in ipairs({...}) do
+        threads{updateFunc = thread.create(function ()
+            while true do
+                updateFunc()
+                thread.current():suspend()
+            end
+        end)}
     end
 end
 
@@ -131,6 +128,8 @@ exitThread = thread.create(function ()
     end
 end)
 
+createThreads(mainFunction)
+
 mainThread = thread.create(function ()
     while true do
         mainFunction()
@@ -160,10 +159,10 @@ barThread = thread.create(function ()
 end)
 
 --start timers/listeners
-timer10     = event.timer(8, slowUpdate, math.huge)
-timer2      = event.timer(2, mainUpdate, math.huge)
-dataTimer   = event.timer(0.5, dataUpdate, math.huge)
-barTimer    = event.timer(0.5, barUpdate, math.huge)
+timer10     = event.timer(8,    update(slowThread), math.huge)
+timer2      = event.timer(2,    update(mainThread), math.huge)
+dataTimer   = event.timer(0.5,  update(dataThread), math.huge)
+barTimer    = event.timer(0.5,  update(barThread),  math.huge)
 
 thread.waitForAny({exitThread})
 
