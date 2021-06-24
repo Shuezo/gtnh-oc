@@ -1,7 +1,7 @@
 --[[
 Date: 2021/06/05 
 Author: A. Jones & S. Huezo
-Version: 1.0
+Version: 2.0
 Usage: To be used in conjunction with Monitor.lua
 ]]--
 ------------Variables------------
@@ -31,7 +31,7 @@ local batData =	{
 ----------Main Functions----------
 
 -- to be called in slower function
-function Power.updateBatData()
+function Power.updateBatData() --pulls battery data from battery buffer
 	local c, m, i, o = bat:sensorInfo({3,"a"}, {3,"e"}, {5}, {7})
 	local tmpData = batData
 
@@ -57,7 +57,7 @@ function Power.updateBatData()
 end --end updateBatData
 
 -- to be called in faster function to update CalcData
-function Power.calcBatData()
+function Power.calcBatData() --manipulates battery data from battery buffer
 	local tmpData = batData
 	
 	if tmpData.ref[1] ~= tmpData.ref[2] then
@@ -85,11 +85,11 @@ function Power.calcBatData()
 
 end -- end calcBatData
 
-function Power.saveRef(dat)
+function Power.saveRef(dat) --Syncs calculated data with incomming data from APIs
 	local ref = batData.ref[1]
 	batData = dat
 	batData.ref[2] = ref -- ref[1] saved to ref[2]
-end
+end --end saveRef
 
 -------- GET functions ---------
 
@@ -119,7 +119,7 @@ end --end energyUsage
 
 function Power.getData()
 	return batData
-end
+end --end GetData
 
 ------ Calculations -------
 
@@ -127,7 +127,7 @@ function Power.checkBatteryLevel()
 	return Power.checkCurrentCharge() / Power.checkMaxCharge()
 end -- end checkBatteryLevel
 
-function Power.timeRemaining()
+function Power.timeRemaining() -- calculates time remaining for battery to fill/empty
 	local t = 0 --initialized time
 	local m = 0 --calculated minutes
 	local s = 0 --caluclated seconds
@@ -158,7 +158,7 @@ function Power.timeRemaining()
 end --end timeRemaining
 
 ---- Reactor control ----
-function Power.reactorPower()
+function Power.reactorPower() -- checks reactor power status
 	local reactorOn = batData.isOn
 	if not reactorOn and Power.checkBatteryLevel() < 0.9 then
 		Power.reactorOn()
@@ -167,13 +167,13 @@ function Power.reactorPower()
 	end
 end --end reactorPower
 
-function Power.reactorOff()
+function Power.reactorOff() -- turns reactor off via redstone
 	local redstoneOff = { 0,  0,  0,  0,  0,  0}
 	redstone.setOutput(redstoneOff)
 	batData.isOn = false
 end --end reactorOff
 
-function Power.reactorOn()
+function Power.reactorOn() -- turns reactor on via redstone
 	local redstoneOn  = {15, 15, 15, 15, 15, 15}
 	redstone.setOutput(redstoneOn)
 	batData.isOn = true
@@ -212,7 +212,10 @@ function Power.checkStorage() --returns EU from durability of fuel rods in buffe
 end --end checkStorage
 
 function Power.checkFuelRem() --returns a value between 1 in 100 representing fuel remaining in reactor
-	return ( 100 - chest.getStackInSlot(2,21)["damage"] ) / 100
+	local a = 100 - chest.getStackInSlot(2,21)["damage"] * 4 --get durability of fuel in reactor (durability of 1 rod, multiplies by num of rods)
+	local b = chest.getStackInSlot(4,4)["size"] * 100 --get amount of fuel rods in buffer
+	local c = chest.getStackInSlot(4,3)["size"] * 100 --get amount of spent fuel rods
+	return	(a + b) / (a + b + c)
 end --end checkFuelRem
 
 

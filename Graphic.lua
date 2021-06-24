@@ -1,7 +1,7 @@
 --[[
 Date: 2021/06/05 
 Author: A. Jones & S. Huezo
-Version: 1.2
+Version: 2.0
 Usage: To be used in conjunction with Monitor.lua
 ]]--
 ------------Variables------------
@@ -20,43 +20,9 @@ local EBF = GtMachine:new("c1b4311d-993d-4d9b-8da0-71c97f8e003b")
 
 local gpu = component.gpu
 
-COLOR = { blue 		= 0x4286F4,
-		  darkAqua	= 0x3392FF,
-		  purple 	= 0xB673d6,
-		  red 		= 0xC14141,
-		  green 	= 0x0DA841,
-		  black 	= 0x000000,
-		  white 	= 0xFFFFFF,
-		  grey 		= 0x252525,
-		  lightGrey = 0xBBBBBB,
-		  darkGrey 	= 0x262626 }
-
 ------------Generic Functions------------
 
-function Graphic.clearScreen()
-	gpu.setBackground(COLOR.black)
-	gpu.fill(1, 1, W, H, " ")
-end --clears the screen
-
-function Graphic.setupResolution()
-	--Use the resolution to help position all of the UI elements
-	--Also sets the resolution to the maximum that is possible
-	local maxW, maxH = gpu.maxResolution()
-	if (W ~= maxW) and (H ~= maxH) then
-		gpu.setResolution(maxW, maxH)
-		local x, y = gpu.getResolution()
-		W, H = x, y
-		return true
-	elseif (W == maxW and H == maxH) then
-		local x, y = gpu.getResolution()
-		W, H = x, y
-		return true
-	else
-		return false
-	end
-end --end setupResolution
-
-function Graphic.SplashScreen(textA, textB)
+function Graphic.SplashScreen(textA, textB) --creates splashscreen
 	Graphic.drawBox(COLOR.darkGrey, 1, 1, W, H)
 	Graphic.drawExit(W, 1)
 	Graphic.drawFrame(COLOR.lightGrey, COLOR.darkGrey, W/2-10, H/2-3, W/2+10, H/2+2)
@@ -66,15 +32,7 @@ function Graphic.SplashScreen(textA, textB)
 	gpu.set(Functions.centerText(W/2, textB),H/2, textB)
 	gpu.setForeground(COLOR.white)
 	gpu.setBackground(COLOR.black)
-end
-
-function Graphic.buffer()
-	--set buffer to not 0
-	--display data on buffer
-	--wait until data loads
-	--remove 
-	gpu.setActiveBuffer()
-end
+end --end SplashScreen
 
 function Graphic.drawFrame(clr, fill, x1, y1, x2, y2)
 	local barWidth  = math.abs(x2 - x1) + 1
@@ -125,11 +83,11 @@ end --end drawExit
 
 function Graphic.updatePowerData()
 	local batData 	= Power.getData()
-	
-	local energy 	= batData.energyIn - batData.energyOut
 	local rem 		= batData.time
-	local output 	= batData.energyIn
 	local status 	= batData.isOn
+	local output 	= batData.energyIn
+	local load		= batData.energyOut
+	local energy 	= output - load
 
 	--local heat = Power.checkHeatpercent()
 	--local storage = Power.checkStorage()
@@ -149,7 +107,8 @@ function Graphic.updatePowerData()
 	end
 			
 	gpu.set(8,H-4, string.format("Output: %.0f EU/t    ", output))
-	--if energy > 0 then gpu.set(55,H-4,string.format("Net: +%.0f EU/t    ", energy)) else gpu.set(x,y,string.format("Net: %.0f EU/t    ", energy)) end
+	gpu.set(34,H-5, string.format("Load: %.0f EU/t    ", load))
+	if energy > 0 then gpu.set(35,H-4,string.format("Net: +%.0f EU/t    ", energy)) else gpu.set(35,H-4,string.format("Net: %.0f EU/t    ", energy)) end
 
 	gpu.setBackground(COLOR.darkGrey)
 	--gpu.setForeground(COLOR.white)
@@ -158,19 +117,10 @@ function Graphic.updatePowerData()
 	gpu.setBackground(COLOR.black)
 end --end updateData
 
-
---[[Graphic.updatePowerBar(level, X, Y, barWidth)
-
-	level: 		Value to calculate bar fill and set label 
-	X:			Hor Bar Position
-	Y: 			Vertical Bar Position
-	barWidth: 	Width of bar
-
-]]--
-function Graphic.updatePowerBar(level, x, y, barWidth, fillColor, emptyColor)
-	local fillWidth = math.ceil(barWidth * level)
+function Graphic.updatePowerBar(level, x, y, barWidth, fillColor, emptyColor) --Value to calculate bar fill and set label, Hor Bar Position, Vertical Bar Position, Width of bar, colors
 	local percent = Functions.getPercent(level)
 	local textX = Functions.centerText((x + barWidth)/2, percent)
+	local fillWidth = math.ceil(barWidth * level)
 	local emptyWidth = barWidth - fillWidth
 
 	if fillWidth > 0 then
@@ -198,6 +148,33 @@ function Graphic.updatePowerBar(level, x, y, barWidth, fillColor, emptyColor)
 	gpu.setBackground(COLOR.black)
 end --end UpdatePowerBar
 
+function Graphic.updateReactorBar(level, label, x, y, barHeight, fillColor, emptyColor) --Value to calculate bar fill, label, Hor Bar Position, Vertical Bar Position, Width of bar, colors
+	local percent = Functions.getPercent(level, "3.0")
+	local textPos = x-4, y-2
+	local fillHeight = math.ceil(barHeight * level)
+	local emptyHeight = barHeight - fillHeight
+
+	gpu.setBackground(COLOR.darkGrey)
+	gpu.fill(x,y-2,1,2," ") --fill vertically from the top of the bar up two cells
+	gpu.set(x-12,y-2,string.format(" %s: %-5s", label, percent))
+
+	if fillHeight > 0 then
+		gpu.setBackground(fillColor)
+		for pos=y+barHeight,y+barHeight-fillHeight,-1 do
+			gpu.set(x,pos," ")
+		end
+	end
+	
+	if emptyHeight > 0 then
+		gpu.setBackground(emptyColor)
+		for pos=y+barHeight-fillHeight-1,y,-1 do
+			gpu.set(x,pos," ")
+		end
+	end
+	
+	gpu.setBackground(COLOR.black)
+end --end UpdateReactorBar
+
 ------------Cleanroom Functions------------
 
 function Graphic.updateCleanroomStatus(x, y)
@@ -218,7 +195,7 @@ function Graphic.updateCleanroomStatus(x, y)
 	end
 	gpu.setForeground(COLOR.white)
 	gpu.setBackground(COLOR.black)
-end --end drawLabel
+end --end updateCleanroomStatus
 
 ------------EBF Functions------------
 
@@ -244,6 +221,6 @@ function Graphic.updateEBFStatus(x, y)
 	end
 	gpu.setForeground(COLOR.white)
 	gpu.setBackground(COLOR.black)
-end
+end --end updateEBFstatus
 
 return Graphic

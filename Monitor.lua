@@ -1,7 +1,7 @@
 --[[
 Date: 2021/06/05 
 Author: A. Jones & S. Huezo
-Version: 1.2
+Version: 2.0
 Usage: To be used in conjunction with Power.lua and Graphic.lua and Cleanroom.lua
 ]]--
 package.loaded.Power = nil  --Free memory
@@ -84,26 +84,28 @@ local function mainUpdate()
     Power.reactorPower()
     Graphic.updateCleanroomStatus(4, 3)
     Graphic.updateEBFStatus(4, 7)
-end
+end --end MainUpdate
 
 local function slowUpdate()
     Power.updateBatData()
-end --end slowFunction
+end --end slowUpdate
 
 local function updateData()
     Power.calcBatData()
-end --end calcDataFunction
+end --end updateData
 
 local function updateBars()
     local bat = Power.checkBatteryLevel()
     local fuel = Power.checkFuelRem()
     Graphic.updatePowerData()
     Graphic.updatePowerBar(bat, 3, H-1, W-5, COLOR.green, COLOR.red) --draw powerbar
-    --Graphic.updatePowerBar(fuel, 3, H-2, W-5, COLOR.blue, COLOR.purple)
-end --end barFunction
+    Graphic.updateReactorBar(fuel, "Fuel", W-2, 5, H-8, COLOR.blue, COLOR.purple)
+end --end updateBars
+
+
 
 local function startupFunction()
-	Graphic.clearScreen()
+	Functions.clearScreen()
 	Graphic.drawTitle(title) --draw title bar
 	Graphic.drawBox(COLOR.darkGrey,1,H-2,W,H) --draw background for power bars
 	Graphic.drawExit(W, 1) --draw exit button
@@ -115,10 +117,10 @@ end --end startupFunction
 
 ----------------Main----------------
 
-Graphic.setupResolution() --initial screen setup (hardware)
-Graphic.clearScreen()
+Functions.setupResolution() --initial screen setup (hardware)
+Functions.clearScreen()
 
-if quickBoot == false then
+if quickBoot == false then --provides override for buffer allocation and splashscreen
     Graphic.SplashScreen("Initializing...", "Please Wait")
     local buf = gpu.allocateBuffer(W,H)
     gpu.setActiveBuffer(buf)
@@ -131,7 +133,9 @@ if quickBoot == false then
     gpu.freeBuffer(buf)
 else
     startupFunction()
-end --end Main
+end
+
+-- end main function. From here on its loops and timers.
 
 --start timers/listeners
 timers[slowUpdate]  = event.timer(8,    resume(threads[slowUpdate]),    math.huge)
@@ -147,7 +151,7 @@ stopTimers(timers)
 killThreads(threads)
 
 Power.reactorOff()
-Graphic.clearScreen()
+Functions.clearScreen()
 
 --clean up globals
 W, H, COLOR = nil, nil, nil
