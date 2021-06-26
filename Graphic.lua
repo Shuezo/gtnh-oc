@@ -17,9 +17,7 @@ local GtMachine = require("GtMachine")
 
 local Cleanroom = GtMachine:new("989841fe-0184-4c2d-b793-583f0f63b8d4")
 local EBF = GtMachine:new("c1b4311d-993d-4d9b-8da0-71c97f8e003b")
-ovenA = GtMachine:new("f4e333a6-6d6d-4644-94f1-61fd9bc59ac7")
-ovenB = GtMachine:new("8626cdbe-d849-4a89-a113-6f19fb2d6a90")
-ovenC = GtMachine:new("bd4e77a8-e9dc-4916-b583-2f2692101d39")
+local oven = GtMachine:new("334293f4-3981-4b08-b15a-6ed50b6eb292")
 
 local gpu = component.gpu
 

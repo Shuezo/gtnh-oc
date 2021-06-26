@@ -84,9 +84,9 @@ local function mainUpdate()
     Power.reactorPower()
     Graphic.updateCleanroomStatus(4, 3)
     Graphic.updateEBFStatus(4, 7)
-    Graphic.updateOvenStatus(ovenA, "A", 17, 3)
-    Graphic.updateOvenStatus(ovenB, "B", 17, 7)
-    Graphic.updateOvenStatus(ovenC, "C", 17, 11)
+    --Graphic.updateOvenStatus(ovenA, "A", 17, 3)
+    --Graphic.updateOvenStatus(ovenB, "B", 17, 7)
+    --Graphic.updateOvenStatus(ovenC, "C", 17, 11)
 end --end MainUpdate
 
 local function slowUpdate()
