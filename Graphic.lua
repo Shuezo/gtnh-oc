@@ -17,6 +17,9 @@ local GtMachine = require("GtMachine")
 
 local Cleanroom = GtMachine:new("989841fe-0184-4c2d-b793-583f0f63b8d4")
 local EBF = GtMachine:new("c1b4311d-993d-4d9b-8da0-71c97f8e003b")
+ovenA = GtMachine:new("f4e333a6-6d6d-4644-94f1-61fd9bc59ac7")
+ovenB = GtMachine:new("8626cdbe-d849-4a89-a113-6f19fb2d6a90")
+ovenC = GtMachine:new("bd4e77a8-e9dc-4916-b583-2f2692101d39")
 
 local gpu = component.gpu
 
@@ -188,10 +191,10 @@ function Graphic.updateCleanroomStatus(x, y)
 		gpu.set(x,y+2,"    OK     ")
 	elseif Cleanroom:getProblems() == '0' and Cleanroom:status() == false then
 		gpu.setForeground(COLOR.red)
-		gpu.set(x,y+1," Inactive! ")
+		gpu.set(x,y+2," Inactive! ")
 	else
 		gpu.setForeground(COLOR.red)
-		gpu.set(x,y+1," Problems! ")
+		gpu.set(x,y+2," Problems! ")
 	end
 	gpu.setForeground(COLOR.white)
 	gpu.setBackground(COLOR.black)
@@ -222,5 +225,27 @@ function Graphic.updateEBFStatus(x, y)
 	gpu.setForeground(COLOR.white)
 	gpu.setBackground(COLOR.black)
 end --end updateEBFstatus
+
+------------Pyrolyse Oven Functions------------
+
+function Graphic.updateOvenStatus(id, m, x, y)
+	gpu.setBackground(COLOR.darkGrey)
+	gpu.setForeground(COLOR.darkAqua)
+	gpu.set(x,y,string.format("  Oven \"%s\" ", m))
+	gpu.setForeground(COLOR.white)
+	gpu.set(x,y+1,"  Status:  ")
+	if id:getProblems() == '0' and id:status() == true then
+		gpu.setForeground(COLOR.green)
+		gpu.set(x,y+2,"    OK     ")
+	elseif id:getProblems() == '0' and id:status() == false then
+		gpu.setForeground(COLOR.red)
+		gpu.set(x,y+2," Inactive! ")
+	else
+		gpu.setForeground(COLOR.red)
+		gpu.set(x,y+2," Problems! ")
+	end
+	gpu.setForeground(COLOR.white)
+	gpu.setBackground(COLOR.black)
+end --end updateOvenStatus
 
 return Graphic
