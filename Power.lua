@@ -12,11 +12,11 @@ local math      = require("math")
 local Functions = require("Functions")
 local GtMachine = require("GtMachine")
 
-local reactor  = component.proxy("de831599-fabb-44a5-ac3c-4ac71a2f16f5")
+local reactor  = component.proxy("5ca155e9-ba43-4b65-8ba7-2b76d2e8b458")
 local chest    = component.proxy("fa458337-2bdd-4161-94f1-c126ce8571ef")
-local redstone = component.proxy("3c96c747-346c-422d-bae0-bc1918f43ea6")
+local redstone = component.proxy("ac6e4538-fea3-44e0-ac6d-9820e915bc7e")
 
-local bat = GtMachine:new("e4ecc183-dfe1-4fd0-a68f-56589d54902b")
+local bat = GtMachine:new("6bb64abc-8dfd-498f-9cf5-b7c62c11c2fa")
 
 local batData =	{
 					isOn 		= false,
