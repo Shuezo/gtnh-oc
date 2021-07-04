@@ -18,20 +18,19 @@ local component = require("component")
 local Functions = require("Functions")
 local Power = require("Power")
 local Graphic = require("Graphic")
+local computer = require("computer")
 
 local gpu = component.gpu
 
-local threads = {}
-local timers = {}
-
-local locked = false
+local threads   = {}
+local timers    = {}
 
 ------------Variables------------
 
 local title = "MONITORING SYSTEM"
 local quickBoot = false --setting this value to true disables splashscreen and gpu buffer
 
-----------Thread/Timer Functions----------
+----------Thread Functions----------
 
 local function resume(thr)
     return function () 
@@ -44,8 +43,17 @@ end
 local function createThreads(...)
     for i,updateFunc in ipairs({...}) do
         threads[updateFunc] = thread.create(function ()
+            local syc, e
             while true do
-                updateFunc()
+                syc, e = xpcall(updateFunc, debug.traceback)
+
+                if syc == false then
+                    local file = io.open('lastError.log','w')
+                    file:write(e)
+                    file:close()
+                    computer.beep(500,10) --indicate a thread had an error
+                end
+
                 thread.current():suspend()
             end
         end)
@@ -58,30 +66,9 @@ local function killThreads(tbl)
     end
 end
 
-local function stopTimers(tbl)
-    for key, timer in pairs(tbl) do
-        event.cancel(timer)
-    end
-end
-
-threads["exit"] = thread.create(function ()
-    local id, x, y
-    while true do --loop until x is touched
-        id, _, x, y = event.pullMultiple("touch", "interrupted")
-        if id == "interrupted" then
-            break
-        elseif id == "touch" then
-            if x == W and y == 1 then
-                break
-            end
-        end
-    end
-end)
-
----------Main Functions---------
+---------Update Functions---------
 
 local function mainUpdate()
-    Power.reactorPower()
     Graphic.updateCleanroomStatus(4, 3)
     Graphic.updateEBFStatus(4, 7)
     --Graphic.updateOvenStatus(ovenA, "A", 17, 3)
@@ -97,6 +84,10 @@ local function updateData()
     Power.calcBatData()
 end --end updateData
 
+local function controlPower()
+    Power.reactorPower()
+end
+
 local function updateBars()
     local bat = Power.checkBatteryLevel()
     local fuel = Power.checkFuelRem()
@@ -105,7 +96,39 @@ local function updateBars()
     Graphic.updateReactorBar(fuel, "Fuel", W-2, 5, H-8, COLOR.blue, COLOR.purple)
 end --end updateBars
 
+---------Timer Functions---------
 
+local function stopTimers(tbl)
+    for key, timer in pairs(tbl) do
+        event.cancel(timer)
+    end
+end
+
+local function startTimers()
+    timers[slowUpdate]      = event.timer(8,    resume(threads[slowUpdate]),    math.huge)
+    timers[mainUpdate]      = event.timer(2,    resume(threads[mainUpdate]),    math.huge)
+    timers[updateData]      = event.timer(0.5,  resume(threads[updateData]),    math.huge)
+    timers[updateBars]      = event.timer(0.5,  resume(threads[updateBars]),    math.huge)
+    timers[controlPower]    = event.timer(2,    resume(threads[controlPower]),  math.huge)
+end
+
+----------interrupt threads----------
+
+threads["touch"] = thread.create(function ()
+    local id, x, y
+    while true do --loop until x is touched
+        id, _, x, y = event.pullMultiple("touch", "interrupted")
+        if id == "interrupted" then
+            break
+        elseif id == "touch" then       --exit position
+            if x == W and y == 1 then
+                break
+            end
+        end
+    end
+end)
+
+----------------Main----------------
 
 local function startupFunction()
 	Functions.clearScreen()
@@ -115,10 +138,9 @@ local function startupFunction()
 	createThreads(mainUpdate,
                   slowUpdate,
                   updateData,
-                  updateBars)
+                  updateBars,
+                  controlPower)
 end --end startupFunction
-
-----------------Main----------------
 
 Functions.setupResolution() --initial screen setup (hardware)
 Functions.clearScreen()
@@ -138,15 +160,10 @@ else
     startupFunction()
 end
 
--- end main function. From here on its loops and timers.
+startTimers()
 
---start timers/listeners
-timers[slowUpdate]  = event.timer(8,    resume(threads[slowUpdate]),    math.huge)
-timers[mainUpdate]  = event.timer(2,    resume(threads[mainUpdate]),    math.huge)
-timers[updateData]  = event.timer(0.5,  resume(threads[updateData]),    math.huge)
-timers[updateBars]  = event.timer(0.5,  resume(threads[updateBars]),    math.huge)
-
-thread.waitForAny({threads["exit"]})
+-- end main function. Wait until user exits in touch thread
+thread.waitForAny({threads["touch"]})
 
 -----Exit-----
 
