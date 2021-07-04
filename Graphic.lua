@@ -53,12 +53,11 @@ end --end drawFrame
 function Graphic.drawBox(clr, x1, y1, x2, y2)
 	local barWidth = math.abs(x2 - x1) + 1
 	local height = math.abs(y2 - y1) + 1
-	local bg = gpu.getBackground()
 
 	gpu.setBackground(clr)
 	gpu.fill(x1, y1, barWidth, height, " ")
 	
-	gpu.setBackground(bg)
+	gpu.setBackground(COLOR.black)
 end --end drawBox
 
 function Graphic.drawTitle(text)
