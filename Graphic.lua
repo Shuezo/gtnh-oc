@@ -15,7 +15,7 @@ local Functions = require("Functions")
 local Power = require("Power")
 local GtMachine = require("GtMachine")
 
-local Cleanroom = GtMachine:new("989841fe-0184-4c2d-b793-583f0f63b8d4")
+local Cleanroom = GtMachine:new("49e22d69-9915-43af-95e4-12385c4d6867")
 local EBF = GtMachine:new("c1b4311d-993d-4d9b-8da0-71c97f8e003b")
 local oven = GtMachine:new("334293f4-3981-4b08-b15a-6ed50b6eb292")
 
