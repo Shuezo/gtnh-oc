@@ -25,6 +25,8 @@ local gpu = component.gpu
 local threads   = {}
 local timers    = {}
 
+local bat, fuel
+
 ------------Variables------------
 
 local title = "MONITORING SYSTEM"
@@ -78,6 +80,7 @@ end --end MainUpdate
 
 local function slowUpdate()
     Power.updateBatData()
+    fuel = Power.checkFuelRem()
 end --end slowUpdate
 
 local function updateData()
@@ -89,8 +92,7 @@ local function controlPower()
 end
 
 local function updateBars()
-    local bat = Power.checkBatteryLevel()
-    local fuel = Power.checkFuelRem()
+    bat = Power.checkBatteryLevel()
     Graphic.updatePowerData()
     Graphic.updatePowerBar(bat, 3, H-1, W-5, COLOR.green, COLOR.red) --draw powerbar
     Graphic.updateReactorBar(fuel, "Fuel", W-2, 5, H-8, COLOR.blue, COLOR.purple)
