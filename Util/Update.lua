@@ -117,11 +117,13 @@ end
 
 --Download a file from each blob in the tree
 local ver = {}
+local updates = 0
 
 for _, file in pairs(dat.tree) do
     if file.type == "blob" then
         ver[file.path] = file.sha
         if new or ver[file.path] ~= oldVer[file.path] then
+            updates = updates + 1
             downloadFile(file.path)
         end
     end
@@ -130,3 +132,5 @@ end
 local file = io.open('sha','w')
 file:write(json.encode(ver))
 file:close()
+
+print("\nUpdated "..updates.." files.")
