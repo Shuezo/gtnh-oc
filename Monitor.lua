@@ -4,11 +4,11 @@ Author: A. Jones & S. Huezo
 Version: 2.0
 Usage: To be used in conjunction with Power.lua and Graphic.lua and Cleanroom.lua
 ]]--
-package.loaded.Power = nil  --Free memory
-package.loaded.Monitor = nil
-package.loaded.Functions = nil
-package.loaded.Graphic = nil
-package.loaded.GtMachine = nil
+package.loaded["Monitor"] = nil             --Free memory
+package.loaded["Components\\Power"] = nil  
+package.loaded["Components\\Graphic"] = nil
+package.loaded["Components\\GtMachine"] = nil
+package.loaded["Util\\Functions"] = nil
 
 ------------Initilized Values------------
 local event = require("event")
