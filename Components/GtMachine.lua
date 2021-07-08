@@ -10,7 +10,7 @@ local GtMachine = {}
 local component = require("component")
 local math      = require("math")
 local string    = require("string")
-local Functions = require("Functions")
+local Functions = require("../Util/Functions")
 
 function GtMachine:new(addr)
     self.__index = self

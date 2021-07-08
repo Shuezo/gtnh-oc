@@ -9,7 +9,7 @@ local Power = {}
 
 local component = require("component")
 local math      = require("math")
-local Functions = require("Functions")
+local Functions = require("../Util/Functions")
 local GtMachine = require("GtMachine")
 
 local reactor  = component.proxy("5ca155e9-ba43-4b65-8ba7-2b76d2e8b458")

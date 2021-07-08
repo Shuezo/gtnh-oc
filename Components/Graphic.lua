@@ -11,7 +11,7 @@ local component = require("component")
 local term = require("term")
 local string    = require("string")
 
-local Functions = require("Functions")
+local Functions = require("../Util/Functions")
 local Power = require("Power")
 local GtMachine = require("GtMachine")
 
