@@ -11,9 +11,9 @@ local component = require("component")
 local term = require("term")
 local string    = require("string")
 
-local Functions = require("../Util/Functions")
-local Power = require("Power")
-local GtMachine = require("GtMachine")
+local Functions = require("Util\\Functions")
+local Power = require("Components\\Power")
+local GtMachine = require("Components\\GtMachine")
 
 local Cleanroom = GtMachine:new("49e22d69-9915-43af-95e4-12385c4d6867")
 local EBF = GtMachine:new("c1b4311d-993d-4d9b-8da0-71c97f8e003b")

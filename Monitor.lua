@@ -15,9 +15,9 @@ local event = require("event")
 local keyboard = require("keyboard")
 local thread = require("thread")
 local component = require("component")
-local Functions = require("Util/Functions")
-local Power = require("Components/Power")
-local Graphic = require("Components/Graphic")
+local Functions = require("Util\\Functions")
+local Power = require("Components\\Power")
+local Graphic = require("Components\\Graphic")
 local computer = require("computer")
 
 local gpu = component.gpu
