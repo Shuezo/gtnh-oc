@@ -74,7 +74,7 @@ local function splitFile(inputstr)
 end
 
 --Download a file from a github api path and save it to '/programs/repo/'
-local function createFile(path)
+local function downloadFile(path)
     local dir, file = splitFile(path)
     local fullUrl = GIT.FILE_URL.."/"..path
     local dirPath = '/programs/'..GIT.REPO.."/"..dir
@@ -82,21 +82,51 @@ local function createFile(path)
     if not exists(dirPath) then
         shell.execute('mkdir '..dirPath)
     end
+    shell.execute('touch /programs/'..GIT.REPO.."/"..path)
+    shell.execute('rm /programs/'..GIT.REPO.."/"..path)
     shell.execute('wget -fg '..fullUrl..' /programs/'..GIT.REPO.."/"..path)
 end
+
 
 --the data for the json api for the repository
 local dat = getHTTPData(GIT.REPO_URL.."?recursive=1")
 
-if exists("/programs/"..GIT.REPO.."/") then
-    shell.execute("rm -r /programs/"..GIT.REPO.."/")
-end
+local args, _ = shell.parse(...)
+local new = false
+local oldVer = {}
 
-shell.execute("mkdir /programs/"..GIT.REPO.."/")
-
---Download a file from each blob in the tree
-for _, file in pairs(dat.tree) do
-    if file.type == "blob" then
-        createFile(file.path)
+--To reinstall a program
+if args[1] == "new" then
+    new = true
+    if exists("/programs/"..GIT.REPO.."/") then
+        shell.execute("rm -r /programs/"..GIT.REPO.."/")
+    end
+    shell.execute("mkdir /programs/"..GIT.REPO.."/")
+elseif args[1] == "help" then
+    print("usage:\n\tUpdate [param]\nparams:\n\t[none]\t- Updates or creates files\n\tnew\t- Clean Reinstall")
+    os.exit()
+else
+    local oldFile = io.open('sha')
+    if oldFile == nil then 
+        oldVer = {} 
+    else
+        oldVer = json.decode(oldFile:read("*a"))
+        oldFile:close()
     end
 end
+
+--Download a file from each blob in the tree
+local ver = {}
+
+for _, file in pairs(dat.tree) do
+    if file.type == "blob" then
+        ver[file.path] = file.sha
+        if new or ver[file.path] ~= oldVer[file.path] then
+            downloadFile(file.path)
+        end
+    end
+end
+
+local file = io.open('sha','w')
+file:write(json.encode(ver))
+file:close()
