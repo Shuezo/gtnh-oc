@@ -21,36 +21,39 @@ shell.execute('wget -fq "https://raw.githubusercontent.com/LuaDist/dkjson/master
 local json = require("dkjson")
 
 local function exists(dir)
-    local ok, err, code = os.rename(dir, dir)
-    if not ok then
-        if code == 13 then
-            -- permission denied, but it exists
-            return true
-        end
+    local status = os.rename(dir, dir)
+
+    if status == nil then
+        return false
+    else
+        return true
     end
-    return ok, err
+
 end
 
 --gets HTTP data and returns it in a table
 local function getHTTPData(url)
-    local ret = ""
+    local dat = ""
     local req, resp = pcall(internet.request, url)
 
     if(req) then
-        ret = json.decode(resp())
+        local tmp = resp()
+
+        while tmp ~= nil do
+            dat = dat..tmp
+            tmp = resp()
+        end
+
+        dat = json.decode(dat)
     else
         print("Could not connect to "..url)
         return nil
     end
     
-    return ret
+    return dat
 end
 
 local function splitFile(inputstr)
-	if sep == nil then
-			sep = "%s"
-	end
-
     local t = {}
 	local dir  = ""
 
