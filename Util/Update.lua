@@ -20,15 +20,14 @@ shell.execute('wget -fq "https://raw.githubusercontent.com/LuaDist/dkjson/master
 
 local json = require("dkjson")
 
+--Check if directory exists (No error is thrown)
 local function exists(dir)
     local status = os.rename(dir, dir)
-
     if status == nil then
         return false
     else
         return true
     end
-
 end
 
 --gets HTTP data and returns it in a table
@@ -38,29 +37,32 @@ local function getHTTPData(url)
 
     if(req) then
         local tmp = resp()
-
-        while tmp ~= nil do
+        while tmp ~= nil do -- Add response buffer to dat
             dat = dat..tmp
             tmp = resp()
         end
-
-        dat = json.decode(dat)
+        return json.decode(dat) --Return decoded json data
     else
         print("Could not connect to "..url)
         return nil
     end
-    
-    return dat
 end
 
+--[[
+Split up directory and file from the filepath
+
+dir: Directory in the format 'dir1/dir2/dir3/...'
+file: Filename only
+]]
 local function splitFile(inputstr)
     local t = {}
-	local dir  = ""
+    local dir  = ""
 
-	for str in string.gmatch(inputstr, "([^/]+)") do
-            table.insert(t, str)
-	end
-
+    for str in string.gmatch(inputstr, "([^/]+)") do --Delimit '/' 
+        table.insert(t, str)
+    end
+    
+    --Create string representing the directory
     for _, str in pairs(t) do
         if str ~= t[#t] then
             dir = dir..str.."/"
@@ -68,9 +70,10 @@ local function splitFile(inputstr)
     end
     
     local file = t[#t]
-	return dir, file
+    return dir, file
 end
 
+--Download a file from a github api path and save it to '/programs/repo/'
 local function createFile(path)
     local dir, file = splitFile(path)
     local fullUrl = GIT.FILE_URL.."/"..path
@@ -91,6 +94,7 @@ end
 
 shell.execute("mkdir /programs/"..GIT.REPO.."/")
 
+--Download a file from each blob in the tree
 for _, file in pairs(dat.tree) do
     if file.type == "blob" then
         createFile(file.path)
