@@ -1,8 +1,6 @@
 --[[
-Modified 7/7/21 
-by: Sean Huezo
-
-Inspired by github code from rater193
+Created 2021/7/7
+Author: Sean Huezo
 ]]
 
 --CONFIGURATION
@@ -16,9 +14,9 @@ local shell = require("shell")
 local internet = require("internet")
 
 --downloading the json libs if they do not exsist
-shell.execute('wget -fq "https://raw.githubusercontent.com/LuaDist/dkjson/master/dkjson.lua" "/lib/dkjson.lua/"')
+shell.execute('wget -fq "https://raw.githubusercontent.com/rxi/json.lua/master/json.lua" "/lib/json.lua/"')
 
-local json = require("dkjson")
+local json = require("json")
 
 --Check if directory exists (No error is thrown)
 local function exists(dir)
@@ -133,4 +131,4 @@ local file = io.open('sha','w')
 file:write(json.encode(ver))
 file:close()
 
-print("\nUpdated "..updates.." files.")
+print("\nUpdated "..updates.." file(s).")
