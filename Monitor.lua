@@ -133,11 +133,11 @@ end)
 ----------------Main----------------
 
 local function startupFunction()
-	Functions.clearScreen()
-	Graphic.drawTitle(title) --draw title bar
-	Graphic.drawBox(COLOR.darkGrey,1,H-2,W,H) --draw background for power bars
-	Graphic.drawExit(W, 1) --draw exit button
-	createThreads(mainUpdate,
+    Functions.clearScreen()
+    Graphic.drawTitle(title) --draw title bar
+    Graphic.drawBox(COLOR.darkGrey,1,H-2,W,H) --draw background for power bars
+    Graphic.drawExit(W, 1) --draw exit button
+    createThreads(mainUpdate,
                   slowUpdate,
                   updateData,
                   updateBars,
