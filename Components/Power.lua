@@ -18,6 +18,8 @@ local redstone = component.proxy("ac6e4538-fea3-44e0-ac6d-9820e915bc7e")
 
 local bat = GtMachine:new("6bb64abc-8dfd-498f-9cf5-b7c62c11c2fa")
 
+local NUM_RODS = 14
+
 local batData =	{
 					isOn 		= false,
 					energyOut 	= 0,
@@ -212,7 +214,7 @@ function Power.checkStorage() --returns EU from durability of fuel rods in buffe
 end --end checkStorage
 
 function Power.checkFuelRem() --returns a value between 1 in 100 representing fuel remaining in reactor
-	local a = 100 - chest.getStackInSlot(2,21)["damage"] * 4 --get durability of fuel in reactor (durability of 1 rod, multiplies by num of rods)
+	local a = 100 - chest.getStackInSlot(2,21)["damage"] * NUM_RODS --get durability of fuel in reactor (durability of 1 rod, multiplies by num of rods)
 	local b = chest.getStackInSlot(4,4)["size"] * 100 --get amount of fuel rods in buffer
 	local c = chest.getStackInSlot(4,3)["size"] * 100 --get amount of spent fuel rods
 	return	(a + b) / (a + b + c)
