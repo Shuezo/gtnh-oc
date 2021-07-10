@@ -214,7 +214,7 @@ function Power.checkStorage() --returns EU from durability of fuel rods in buffe
 end --end checkStorage
 
 function Power.checkFuelRem() --returns a value between 1 in 100 representing fuel remaining in reactor
-    local a = 100 - chest.getStackInSlot(2,21)["damage"] * NUM_RODS --get durability of fuel in reactor (durability of 1 rod, multiplies by num of rods)
+    local a = ( 100 - chest.getStackInSlot(2,21)["damage"] ) * NUM_RODS --get durability of fuel in reactor (durability of 1 rod, multiplies by num of rods)
     local b = chest.getStackInSlot(4,4)["size"] * 100 --get amount of fuel rods in buffer
     local c = chest.getStackInSlot(4,3)["size"] * 100 --get amount of spent fuel rods
     return  (a + b) / (a + b + c)
