@@ -83,22 +83,12 @@ end --end drawExit
 ------------Power Functions------------
 
 function Graphic.updatePowerData()
-    local LSC_data      = LSC.data
-    local Reactor_data  = Reactor.data
-
-    local rem           = LSC_data.time
-    local status        = Reactor_data.status
-    local R_output      = Reactor_data.output
-    local production    = LSC_data.input
-    local usage         = LSC_data.output
-    local net           = production - usage
-
-    --local heat = Power.checkHeatpercent()
-    --local storage = Power.checkStorage()
-    --local fuel = Power.checkFuelRem()
+    local dataLSC      = LSC.data
+    local dataReactor  = Reactor.data
+    local net          = LSC_data.input - LSC_data.output
 
     gpu.set(8,H-5, "Reactor is ")
-    if status == true then
+    if dataReactor.isOn then
         gpu.setForeground(COLOR.green)
         gpu.set(19,H-5,"ON ")
         gpu.setForeground(COLOR.white)
@@ -110,13 +100,13 @@ function Graphic.updatePowerData()
         Graphic.drawBox(COLOR.red, 3, H-5, 6, H-4)
     end
 
-    gpu.set(8,H-4, string.format("Output: %.0f EU/t    ", R_output))
-    gpu.set(34,H-5, string.format("Load: %.0f EU/t    ", usage))
+    gpu.set(8,H-4, string.format("Output: %.0f EU/t    ", dataReactor.output))
+    gpu.set(34,H-5, string.format("Load: %.0f EU/t    ", dataLSC.output))
     if energy > 0 then gpu.set(35,H-4,string.format("Net: +%.0f EU/t    ", net)) else gpu.set(35,H-4,string.format("Net: %.0f EU/t    ", net)) end
 
     gpu.setBackground(COLOR.darkGrey)
     --gpu.setForeground(COLOR.white)
-    gpu.set(4,H-2,"Battery: " .. rem)
+    gpu.set(4,H-2,"Battery: " .. dataLSC.time)
 
     gpu.setBackground(COLOR.black)
 end --end updateData
