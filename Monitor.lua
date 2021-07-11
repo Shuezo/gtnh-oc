@@ -84,7 +84,7 @@ local function mainUpdate()
 end --end MainUpdate
 
 local function slowUpdate()
-    LSC.updateBatData()
+    LSC.updateData()
     Reactor.updateData()
 end --end slowUpdate
 
