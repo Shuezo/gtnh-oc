@@ -93,7 +93,7 @@ function Graphic.updatePowerData()
         gpu.set(19,H-5,"ON ")
         gpu.setForeground(COLOR.white)
         Graphic.drawBox(COLOR.green, 3, H-5, 6, H-4)
-    else
+    elseif not dataReactor.isOn then
         gpu.setForeground(COLOR.red)
         gpu.set(19,H-5,"OFF")
         gpu.setForeground(COLOR.white)

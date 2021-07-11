@@ -22,7 +22,7 @@ local ON_THRESHOLD = 0.90 --enter as a decimal value
 local OFF_THRESHOLD = 0.99
 
 Reactor.data = {
-                isOn = false,
+                isOn = nil,
                 output = 0,
                 fuel = 0,
                 heat = 0,
@@ -37,11 +37,7 @@ end --end updataBatData
 
 ---- Reactor control ----
 function Reactor.checkStatus() --returns true or false if reactor is running or not.
-    if Reactor.producesEnergy() then
-        Reactor.data.isOn = true
-    else
-        Reactor.data.isOn = false
-    end
+    if Reactor.producesEnergy() then return true else return false end
 end --end checkStatus
 
 function Reactor.on() -- turns reactor on via redstone

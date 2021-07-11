@@ -14,19 +14,19 @@ local GtMachine = require("Components\\GtMachine")
 local LSC       = component.proxy("1cc48397-5b2c-4b14-adba-d6df1b8111be")
 ------------------------------------------------------------------------
 LSC.data = {
-        input       = 0,
-        output      = 0,
-        charge      = 0,
-        Pcharge     = 0,
-        capacity    = 0,
-        ref         = {0,0},   -- 1st is current, 2nd is also current (unless changed)
-        time        = ""
+                input       = 0,
+                output      = 0,
+                charge      = 0,
+                Pcharge     = 0,
+                capacity    = 0,
+                ref         = {0,0},   -- 1st is current, 2nd is also current (unless changed)
+                time        = ""
             }
 
 function LSC.updateData()
     LSC.data.charge      = LSC.getEUStored()
     LSC.data.capacity    = LSC.getEUMaxStored()
-    LSC.data.input       = LSC.getInputVoltage()
+    LSC.data.input       = LSC.getEUInputAverage()
     LSC.data.output      = LSC.getEUOutputAverage()
     LSC.data.Pcharge     = LSC.data.charge / LSC.data.capacity
 end --end updataBatData
