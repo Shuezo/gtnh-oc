@@ -1,25 +1,26 @@
 --[[
 Date: 2021/06/05 
 Author: A. Jones & S. Huezo
-Version: 2.0
-Usage: To be used in conjunction with Monitor.lua
+Version: 3.0
+Usage: To be used in conjunction with Monitor.lua and everything in components folder.
 ]]--
 ------------Variables------------
 local Graphic = {}
 
 local component = require("component")
-local term = require("term")
+local term      = require("term")
 local string    = require("string")
 
 local Functions = require("Util\\Functions")
-local Power = require("Components\\Power")
 local GtMachine = require("Components\\GtMachine")
 
+local Reactor   = require("Components\\Reactor")
+local LSC       = require("Components\\LSC")
 local Cleanroom = GtMachine:new("49e22d69-9915-43af-95e4-12385c4d6867")
-local EBF = GtMachine:new("c1b4311d-993d-4d9b-8da0-71c97f8e003b")
-local oven = GtMachine:new("334293f4-3981-4b08-b15a-6ed50b6eb292")
+local EBF       = GtMachine:new("c1b4311d-993d-4d9b-8da0-71c97f8e003b")
+local oven      = GtMachine:new("334293f4-3981-4b08-b15a-6ed50b6eb292")
 
-local gpu = component.gpu
+local gpu       = component.gpu
 
 ------------Generic Functions------------
 
@@ -82,12 +83,15 @@ end --end drawExit
 ------------Power Functions------------
 
 function Graphic.updatePowerData()
-    local batData   = Power.getData()
-    local rem       = batData.time
-    local status    = batData.isOn
-    local output    = batData.energyIn
-    local load      = batData.energyOut
-    local energy    = output - load
+    local LSC_data      = LSC.data
+    local Reactor_data  = Reactor.data
+
+    local rem           = LSC_data.rem
+    local status        = Reactor_data.data.status
+    local R_output      = Reactor_data.data.output
+    local production    = LSC_data.input
+    local load          = LSC_data.output
+    local net           = production - load
 
     --local heat = Power.checkHeatpercent()
     --local storage = Power.checkStorage()
@@ -106,13 +110,13 @@ function Graphic.updatePowerData()
         Graphic.drawBox(COLOR.red, 3, H-5, 6, H-4)
     end
 
-    gpu.set(8,H-4, string.format("Output: %.0f EU/t    ", output))
+    gpu.set(8,H-4, string.format("Output: %.0f EU/t    ", R_output))
     gpu.set(34,H-5, string.format("Load: %.0f EU/t    ", load))
-    if energy > 0 then gpu.set(35,H-4,string.format("Net: +%.0f EU/t    ", energy)) else gpu.set(35,H-4,string.format("Net: %.0f EU/t    ", energy)) end
+    if energy > 0 then gpu.set(35,H-4,string.format("Net: +%.0f EU/t    ", net)) else gpu.set(35,H-4,string.format("Net: %.0f EU/t    ", net)) end
 
     gpu.setBackground(COLOR.darkGrey)
     --gpu.setForeground(COLOR.white)
-    gpu.set(4,H-2,"Battery Buffer: " .. rem)
+    gpu.set(4,H-2,"Battery: " .. rem)
 
     gpu.setBackground(COLOR.black)
 end --end updateData

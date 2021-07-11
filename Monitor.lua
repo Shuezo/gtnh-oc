@@ -1,8 +1,8 @@
 --[[
 Date: 2021/06/05 
 Author: A. Jones & S. Huezo
-Version: 2.0
-Usage: To be used in conjunction with Power.lua and Graphic.lua and Cleanroom.lua
+Version: 3.0
+Usage: To be used in conjunction with Components and and everything in components folder.
 ]]--
 package.loaded["Monitor"] = nil             --Free memory
 package.loaded["Components\\Power"] = nil  
@@ -79,23 +79,22 @@ local function mainUpdate()
 end --end MainUpdate
 
 local function slowUpdate()
-    Power.updateBatData()
-    fuel = Power.checkFuelRem()
+    LSC.updateBatData()
+    Reactor.updateData()
 end --end slowUpdate
 
 local function updateData()
-    Power.calcBatData()
+    LSC.calcBatData()
 end --end updateData
 
 local function controlPower()
-    Power.reactorPower()
+    Reactor.switch()
 end
 
 local function updateBars()
-    bat = Power.checkBatteryLevel()
     Graphic.updatePowerData()
-    Graphic.updatePowerBar(bat, 3, H-1, W-5, COLOR.green, COLOR.red) --draw powerbar
-    Graphic.updateReactorBar(fuel, "Fuel", W-2, 5, H-8, COLOR.blue, COLOR.purple)
+    Graphic.updatePowerBar(LSC.data.Pcharge, 3, H-1, W-5, COLOR.green, COLOR.red) --draw powerbar
+    Graphic.updateReactorBar(Reactor.data.fuel, "Fuel", W-2, 5, H-8, COLOR.blue, COLOR.purple)
 end --end updateBars
 
 ---------Timer Functions---------

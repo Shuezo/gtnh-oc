@@ -29,6 +29,8 @@ function GtMachine:craftingStatus()
     return string.format(" %3.0fs/%3.0fs ", self.controller.getWorkProgress() / 20, self.controller.getWorkMaxProgress() / 20 )
 end --end craftingStatus
 
+
+
 --[[
     GtMachine:sensorInfo(args)
     args: {line, sensorTag (optional)}, ...
