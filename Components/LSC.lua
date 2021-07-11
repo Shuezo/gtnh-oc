@@ -57,10 +57,10 @@ function LSC.timeRemaining() -- calculates time remaining for battery to fill/em
     local m = 0 --calculated minutes
     local s = 0 --caluclated seconds
     local h = 0 --calculated hours
-    local load = LSC.data.input - LSC.data.output
+    local u = LSC.data.input - LSC.data.output --energy usage
 
     if u < 0 then
-        t = math.abs(LSC.data.charge / load) / 20 --time=(currentCharge/Usage)*coversion from ticks to seconds
+        t = math.abs(LSC.data.charge / u ) / 20 --time=(currentCharge/Usage)*coversion from ticks to seconds
         s = t % 60
         m = (t % 3600) / 60
         h = t / 3600
@@ -68,7 +68,7 @@ function LSC.timeRemaining() -- calculates time remaining for battery to fill/em
     elseif u == 0 then
         t = "No load                          "
     else
-        t = (LSC.data.capacity - LSC.data.charge) / load / 20 --time=(maxCharge-currentCharge/Usage)*conversion from ticks to seconds
+        t = (LSC.data.capacity - LSC.data.charge) / u / 20 --time=(maxCharge-currentCharge/Usage)*conversion from ticks to seconds
         s = t % 60
         m = (t % 3600) / 60
         h = t / 3600
