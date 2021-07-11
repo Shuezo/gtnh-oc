@@ -28,7 +28,7 @@ function LSC.updateData()
     LSC.data.capacity    = LSC.getEUMaxStored()
     LSC.data.input       = LSC.getInputVoltage()
     LSC.data.output      = LSC.getEUOutputAverage()
-    LSC.data.Pcharge     = LSC.charge / LSC.capacity
+    LSC.data.Pcharge     = LSC.data.charge / LSC.data.capacity
 end --end updataBatData
 
 --function LSC.checkBatteryLevel()
