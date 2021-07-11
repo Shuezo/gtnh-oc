@@ -85,7 +85,7 @@ end --end drawExit
 function Graphic.updatePowerData()
     local dataLSC      = LSC.data
     local dataReactor  = Reactor.data
-    local net          = LSC_data.input - LSC_data.output
+    local net          = dataLSC.input - dataLSC.output
 
     gpu.set(8,H-5, "Reactor is ")
     if dataReactor.isOn then
