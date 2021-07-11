@@ -4,23 +4,28 @@ Author: A. Jones & S. Huezo
 Version: 3.0
 Usage: To be used in conjunction with Components and and everything in components folder.
 ]]--
-package.loaded["Monitor"] = nil             --Free memory
-package.loaded["Components\\Power"] = nil  
-package.loaded["Components\\Graphic"] = nil
+package.loaded["Monitor"]               = nil          --Free memory
+package.loaded["Util\\Functions"]       = nil
+package.loaded["Components\\Graphic"]   = nil
 package.loaded["Components\\GtMachine"] = nil
-package.loaded["Util\\Functions"] = nil
+package.loaded["Components\\Reactor"]   = nil
+package.loaded["Components\\LSC"]       = nil
 
 ------------Initilized Values------------
-local event = require("event")
-local keyboard = require("keyboard")
-local thread = require("thread")
+local event     = require("event")
+local keyboard  = require("keyboard")
+local thread    = require("thread")
 local component = require("component")
-local Functions = require("Util\\Functions")
-local Power = require("Components\\Power")
-local Graphic = require("Components\\Graphic")
-local computer = require("computer")
 
-local gpu = component.gpu
+local Functions = require("Util\\Functions")
+
+local LSC       = require("Components\\LSC")
+local Reactor   = require("Components\\Reactor")
+local Graphic   = require("Components\\Graphic")
+
+local computer  = require("computer")
+
+local gpu       = component.gpu
 
 local threads   = {}
 local timers    = {}
@@ -171,7 +176,7 @@ thread.waitForAny({threads["touch"]})
 stopTimers(timers)
 killThreads(threads)
 
-Power.reactorOff()
+Reactor.off()
 Functions.clearScreen()
 
 --clean up globals
