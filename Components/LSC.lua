@@ -35,7 +35,7 @@ end --end updataBatData
 --    return 
 --end -- end checkBatteryLevel
 
-function LSC.calcBatData() --manipulates battery data from battery buffer
+function LSC.calcData() --manipulates battery data from battery buffer
     local tmpData = LSC.data
     
     if tmpData.ref[1] ~= tmpData.ref[2] then

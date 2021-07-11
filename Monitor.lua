@@ -86,18 +86,18 @@ end --end MainUpdate
 local function slowUpdate()
     LSC.updateData()
     Reactor.updateData()
+    Graphic.updatePowerData()
 end --end slowUpdate
 
-local function updateData()
-    LSC.calcBatData()
-end --end updateData
+local function calcData()
+    LSC.calcData()
+end --end calcData
 
 local function controlPower()
     Reactor.switch()
 end
 
 local function updateBars()
-    Graphic.updatePowerData()
     Graphic.updatePowerBar(LSC.data.Pcharge, 3, H-1, W-5, COLOR.green, COLOR.red) --draw powerbar
     Graphic.updateReactorBar(Reactor.data.fuel, "Fuel", W-2, 5, H-8, COLOR.blue, COLOR.purple)
 end --end updateBars
@@ -113,7 +113,7 @@ end
 local function startTimers()
     timers[slowUpdate]      = event.timer(8,    resume(threads[slowUpdate]),    math.huge)
     timers[mainUpdate]      = event.timer(2,    resume(threads[mainUpdate]),    math.huge)
-    timers[updateData]      = event.timer(0.5,  resume(threads[updateData]),    math.huge)
+    timers[calcData]        = event.timer(0.5,  resume(threads[calcData]),      math.huge)
     timers[updateBars]      = event.timer(0.5,  resume(threads[updateBars]),    math.huge)
     timers[controlPower]    = event.timer(2,    resume(threads[controlPower]),  math.huge)
 end
@@ -143,7 +143,7 @@ local function startupFunction()
     Graphic.drawExit(W, 1) --draw exit button
     createThreads(mainUpdate,
                   slowUpdate,
-                  updateData,
+                  calcData,
                   updateBars,
                   controlPower)
 end --end startupFunction
