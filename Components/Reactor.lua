@@ -49,6 +49,7 @@ end --end on
 function Reactor.off() -- turns reactor off via redstone
     local redstoneOff = { 0,  0,  0,  0,  0,  0}
     redstone.setOutput(redstoneOff)
+    if Reactor.checkStatus() == true then return end
     Reactor.data.isOn = false
 end --end off
 
