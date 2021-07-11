@@ -86,12 +86,12 @@ function Graphic.updatePowerData()
     local LSC_data      = LSC.data
     local Reactor_data  = Reactor.data
 
-    local rem           = LSC_data.rem
-    local status        = Reactor_data.data.status
-    local R_output      = Reactor_data.data.output
+    local rem           = LSC_data.time
+    local status        = Reactor_data.status
+    local R_output      = Reactor_data.output
     local production    = LSC_data.input
-    local load          = LSC_data.output
-    local net           = production - load
+    local usage         = LSC_data.output
+    local net           = production - usage
 
     --local heat = Power.checkHeatpercent()
     --local storage = Power.checkStorage()
@@ -111,7 +111,7 @@ function Graphic.updatePowerData()
     end
 
     gpu.set(8,H-4, string.format("Output: %.0f EU/t    ", R_output))
-    gpu.set(34,H-5, string.format("Load: %.0f EU/t    ", load))
+    gpu.set(34,H-5, string.format("Load: %.0f EU/t    ", usage))
     if energy > 0 then gpu.set(35,H-4,string.format("Net: +%.0f EU/t    ", net)) else gpu.set(35,H-4,string.format("Net: %.0f EU/t    ", net)) end
 
     gpu.setBackground(COLOR.darkGrey)
