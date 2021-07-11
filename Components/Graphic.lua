@@ -102,7 +102,7 @@ function Graphic.updatePowerData()
 
     gpu.set(8,H-4, string.format("Output: %.0f EU/t    ", dataReactor.output))
     gpu.set(34,H-5, string.format("Load: %.0f EU/t    ", dataLSC.output))
-    if energy > 0 then gpu.set(35,H-4,string.format("Net: +%.0f EU/t    ", net)) else gpu.set(35,H-4,string.format("Net: %.0f EU/t    ", net)) end
+    if net > 0 then gpu.set(35,H-4,string.format("Net: +%.0f EU/t    ", net)) else gpu.set(35,H-4,string.format("Net: %.0f EU/t    ", net)) end
 
     gpu.setBackground(COLOR.darkGrey)
     --gpu.setForeground(COLOR.white)
