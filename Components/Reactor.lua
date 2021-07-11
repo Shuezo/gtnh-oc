@@ -29,7 +29,7 @@ Reactor.data = {
                 }
 
 function Reactor.updateData()
-    Reactor.data.isOn       = Reactor.checkStats()
+    Reactor.data.isOn       = Reactor.checkStatus()
     Reactor.data.output     = Reactor.checkOutput()
     Reactor.data.fuel       = Reactor.checkFuelRem()
     Reactor.data.heat       = nil
