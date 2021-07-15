@@ -12,7 +12,7 @@ local GtMachine = require("Components\\GtMachine")
 
 -------------------------------------------------------------------------
 local Turbine   = component.proxy("cc5ead40-5cd1-4df9-966a-671b41e20d38")
-local redstone  = component.proxy("0f707138-4a56-4eae-9bab-44b9219a57c6")
+local redstone  = component.proxy("cd5f5cfe-81e6-4ef6-b3bd-955ccb08f48a")
 -------------------------------------------------------------------------
 
 local SAFETY_THRESHOLD = 2
@@ -25,7 +25,7 @@ Turbine.data  = {
                 }
 
 function Turbine.updateData()
-    Turbine.data.isOn       = Turbine:status()
+    Turbine.data.isOn       = Turbine.status()
     Turbine.data.output     = Turbine.checkOutput()
     Turbine.data.durability = Turbine.checkDurability()
     Turbine.data.problems   = Turbine.checkProblems()

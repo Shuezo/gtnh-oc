@@ -14,6 +14,7 @@ local GtMachine = require("Components\\GtMachine")
 local LSC       = component.proxy("1cc48397-5b2c-4b14-adba-d6df1b8111be")
 -------------------------------------------------------------------------
 LSC.data      = {
+                isOn        = 0,
                 input       = 0,
                 output      = 0,
                 charge      = 0,
@@ -25,6 +26,7 @@ LSC.data      = {
                 }
 
 function LSC.updateData()
+    LSC.data.isOn           = LSC.status()
     LSC.data.charge         = LSC.getEUStored()
     LSC.data.capacity       = LSC.getEUMaxStored()
     LSC.data.input          = LSC.getEUInputAverage()
@@ -77,8 +79,12 @@ function LSC.timeRemaining() -- calculates time remaining for battery to fill/em
     
 end --end timeRemaining
 
+function LSC.status()
+    return LSC.isMachineActive()
+end --end check if machine is on
+
 function LSC.checkProblems() -- returns boolean if problems exist or not.
-    return LSC.getSensorInformation()[2] ~= '§aNo Maintenance issues§r'
+    return LSC.getSensorInformation()[9] ~= 'Maintenance Status: §aWorking perfectly§r'
 end --end checkProblems
 
 return LSC
