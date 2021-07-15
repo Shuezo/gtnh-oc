@@ -10,7 +10,7 @@ package.loaded["Components\\Graphic"]   = nil
 package.loaded["Components\\GtMachine"] = nil
 package.loaded["Components\\Reactor"]   = nil
 package.loaded["Components\\LSC"]       = nil
-package.loaded["components\\Turbine"]   = nil
+package.loaded["Components\\Turbine"]   = nil
 
 ------------Initilized Values------------
 local event     = require("event")

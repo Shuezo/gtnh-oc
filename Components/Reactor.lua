@@ -11,17 +11,17 @@ local Functions = require("Util\\Functions")
 local GtMachine = require("Components\\GtMachine")
 local LSC       = require("Components\\LSC")
 
-------------------------------------------------------------------------
-local Reactor  = component.proxy("5ca155e9-ba43-4b65-8ba7-2b76d2e8b458")
-local chest    = component.proxy("fa458337-2bdd-4161-94f1-c126ce8571ef")
-local redstone = component.proxy("ac6e4538-fea3-44e0-ac6d-9820e915bc7e")
-------------------------------------------------------------------------
+-------------------------------------------------------------------------
+local Reactor   = component.proxy("5ca155e9-ba43-4b65-8ba7-2b76d2e8b458")
+local chest     = component.proxy("fa458337-2bdd-4161-94f1-c126ce8571ef")
+local redstone  = component.proxy("ac6e4538-fea3-44e0-ac6d-9820e915bc7e")
+-------------------------------------------------------------------------
 
 local NUM_RODS              = 14 --total number of fuel rods across all reactors in setup
 local ON_THRESHOLD          = 0.90 --enter as a decimal value
 local OFF_THRESHOLD         = 0.99
 
-Reactor.data = {
+Reactor.data  = {
                 isOn        = nil,
                 output      = 0,
                 fuel        = 0,

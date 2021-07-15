@@ -10,17 +10,17 @@ local math      = require("math")
 local Functions = require("Util\\Functions")
 local GtMachine = require("Components\\GtMachine")
 
-------------------------------------------------------------------------
-local Turbine   = GtMachine:new("cc5ead40-5cd1-4df9-966a-671b41e20d38")
+-------------------------------------------------------------------------
+local Turbine   = component.proxy("cc5ead40-5cd1-4df9-966a-671b41e20d38")
 local redstone  = component.proxy("0f707138-4a56-4eae-9bab-44b9219a57c6")
-------------------------------------------------------------------------
+-------------------------------------------------------------------------
 
 local SAFETY_THRESHOLD = 2
 
-Turbine.data = {
+Turbine.data  = {
                 isOn        = nil,
-                output      = 0,
-                durability  = 0,
+                output      = "",
+                durability  = 100,
                 problems    = false,
                 }
 
@@ -33,31 +33,33 @@ end --end updateData
 
 ---- Turbine Telemetry ----
 
-function Turbine.checkOutput() --returns string with EU output (unformatted)
-    return true end --string.sub(Turbine.getSensorInformation()[1], 27, 30) end
+function Turbine.checkOutput() --returns unformatted string with EU output
+    return string.sub(Turbine.getSensorInformation()[1], 27, 30)
+end --end checkOutput
 
 function Turbine.checkProblems() -- returns boolean if problems exist or not.
     if string.sub(Turbine.getSensorInformation()[2]) == '§aNo Maintenance Issues§r' then return false
-    else return true end
+    else return true
+    end
 end --end checkProblems
 
 function Turbine.checkDurability() --returns unformattted string representing percentile durability (0-100)
-    return string.sub(Turbine.getSensorInformation()[7], 20, 21) end
+    return string.sub(Turbine.getSensorInformation()[7], 20, 21) 
+end --end checkDurability
 
 
 ---- Turbine Logic Control ----
 
-function Turbine.shutdown()
+function Turbine.shutdown() --shuts down the turbine by removing a redstone signal (presumably controlling a pump)
     local redstoneOff = { 0,  0,  0,  0,  0,  0}
     redstone.setOutput(redstoneOff)
     Turbine.data.isOn = false
-end
+end --end Shutdown
 
-function Turbine.safetySwitch()
+function Turbine.safetySwitch() --logic for turning off the turbine
     if Turbine.data.durability <= SAFETY_THRESHOLD then Turbine.shutdown()
-    else return end
-end
-
-
+    else return
+    end
+end --end safetySwitch
 
 return Turbine

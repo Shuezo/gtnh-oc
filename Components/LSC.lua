@@ -13,7 +13,7 @@ local GtMachine = require("Components\\GtMachine")
 -------------------------------------------------------------------------
 local LSC       = component.proxy("1cc48397-5b2c-4b14-adba-d6df1b8111be")
 -------------------------------------------------------------------------
-LSC.data = {
+LSC.data      = {
                 input       = 0,
                 output      = 0,
                 charge      = 0,
@@ -21,8 +21,8 @@ LSC.data = {
                 capacity    = 0,
                 ref         = {0,0},   -- 1st is current, 2nd is also current (unless changed)
                 time        = "",
-                problems    = false,
-            }
+                problems    = false, --TODO TO BE IMPLEMENTED
+                }
 
 function LSC.updateData()
     LSC.data.charge         = LSC.getEUStored()
