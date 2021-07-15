@@ -21,11 +21,7 @@ local json = require("json")
 --Check if directory exists (No error is thrown)
 local function exists(dir)
     local status = os.rename(dir, dir)
-    if status == nil then
-        return false
-    else
-        return true
-    end
+    return status ~= nil
 end
 
 --gets HTTP data and returns it in a table
