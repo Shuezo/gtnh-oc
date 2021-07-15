@@ -42,7 +42,7 @@ function Turbine.checkOutput() --returns unformatted string with EU output
 end --end checkOutput
 
 function Turbine.checkProblems() -- returns boolean if problems exist or not.
-    return Turbine.getSensorInformation()[2] ~= '§aNo Maintenance Issues§r'
+    return Turbine.getSensorInformation()[2] ~= '§aNo Maintenance issues§r'
 end --end checkProblems
 
 function Turbine.checkDurability() --returns unformattted string representing percentile durability (0-100)
