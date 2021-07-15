@@ -10,9 +10,9 @@ local math      = require("math")
 local Functions = require("Util\\Functions")
 local GtMachine = require("Components\\GtMachine")
 
-------------------------------------------------------------------------
+-------------------------------------------------------------------------
 local LSC       = component.proxy("1cc48397-5b2c-4b14-adba-d6df1b8111be")
-------------------------------------------------------------------------
+-------------------------------------------------------------------------
 LSC.data = {
                 input       = 0,
                 output      = 0,
@@ -24,12 +24,12 @@ LSC.data = {
             }
 
 function LSC.updateData()
-    LSC.data.charge      = LSC.getEUStored()
-    LSC.data.capacity    = LSC.getEUMaxStored()
-    LSC.data.input       = LSC.getEUInputAverage()
-    LSC.data.output      = LSC.getEUOutputAverage()
-    LSC.data.Pcharge     = LSC.data.charge / LSC.data.capacity
-end --end updataBatData
+    LSC.data.charge         = LSC.getEUStored()
+    LSC.data.capacity       = LSC.getEUMaxStored()
+    LSC.data.input          = LSC.getEUInputAverage()
+    LSC.data.output         = LSC.getEUOutputAverage()
+    LSC.data.Pcharge        = LSC.data.charge / LSC.data.capacity
+end --end updateData
 
 --function LSC.checkBatteryLevel()
 --    return 
@@ -50,7 +50,7 @@ function LSC.calcData() --manipulates battery data from battery buffer
     LSC.data.ref[2] = ref -- ref[1] saved to ref[2]
 
     LSC.timeRemaining()
-end
+end --end CalcData
 
 function LSC.timeRemaining() -- calculates time remaining for battery to fill/empty
     local t = 0 --initialized time

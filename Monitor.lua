@@ -87,6 +87,7 @@ local function slowUpdate()
     LSC.updateData()
     Reactor.updateData()
     Graphic.updatePowerData()
+    Graphic.drawStatusTile('Turbine',Turbine.data, 17, 3)
 end --end slowUpdate
 
 local function calcData()

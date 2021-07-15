@@ -17,15 +17,15 @@ local chest    = component.proxy("fa458337-2bdd-4161-94f1-c126ce8571ef")
 local redstone = component.proxy("ac6e4538-fea3-44e0-ac6d-9820e915bc7e")
 ------------------------------------------------------------------------
 
-local NUM_RODS = 14 --total number of fuel rods across all reactors in setup
-local ON_THRESHOLD = 0.90 --enter as a decimal value
-local OFF_THRESHOLD = 0.99
+local NUM_RODS              = 14 --total number of fuel rods across all reactors in setup
+local ON_THRESHOLD          = 0.90 --enter as a decimal value
+local OFF_THRESHOLD         = 0.99
 
 Reactor.data = {
-                isOn = nil,
-                output = 0,
-                fuel = 0,
-                heat = 0,
+                isOn        = nil,
+                output      = 0,
+                fuel        = 0,
+                heat        = 0,
                 }
 
 function Reactor.updateData()
@@ -33,7 +33,7 @@ function Reactor.updateData()
     Reactor.data.output     = Reactor.checkOutput()
     Reactor.data.fuel       = Reactor.checkFuelRem()
     Reactor.data.heat       = nil
-end --end updataBatData
+end --end updataData
 
 ---- Reactor control ----
 function Reactor.checkStatus() --returns true or false if reactor is running or not.

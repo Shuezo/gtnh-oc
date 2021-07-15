@@ -80,7 +80,28 @@ function Graphic.drawExit(x,y)
     gpu.setForeground(fg)
 end --end drawExit
 
-------------Power Functions------------
+function Graphic.drawStatusTile(title, machine, x, y)
+    Graphic.drawBox(COLOR.darkGrey, x, y, x+10, y+2)
+    gpu.setBackground(COLOR.darkGrey)
+    gpu.setForeground(COLOR.darkAqua)
+    gpu.set(x+5,y,Functions.centerText(title))
+    gpu.setForeground(COLOR.white)
+    gpu.set(x,y+1,"  Status:  ")
+    if not machine.problems and machine.isOn == true then
+        gpu.setForeground(COLOR.green)
+        gpu.set(x,y+2,"    OK     ")
+    elseif not machine.problems and not machine.isOn then
+        gpu.setForeground(COLOR.red)
+        gpu.set(x,y+2," Inactive! ")
+    else
+        gpu.setForeground(COLOR.red)
+        gpu.set(x,y+2," Problems! ")
+    end
+    gpu.setForeground(COLOR.white)
+    gpu.setBackground(COLOR.black)
+end --end drawStatusTile
+
+------------Reactor Functions------------
 
 function Graphic.updatePowerData()
     local dataLSC      = LSC.data
@@ -168,6 +189,9 @@ function Graphic.updateReactorBar(level, label, x, y, barHeight, fillColor, empt
 
     gpu.setBackground(COLOR.black)
 end --end UpdateReactorBar
+
+------------Turbine Functions------------
+
 
 ------------Cleanroom Functions------------
 
