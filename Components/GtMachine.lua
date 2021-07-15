@@ -12,21 +12,21 @@ local math      = require("math")
 local string    = require("string")
 local Functions = require("Util\\Functions")
 
-----------------------------------------------------------------
-self.data  = {
+--[[----------------------------------------------------------------
+self.data     = {
                 isOn        = nil,
                 output      = 0,
                 durability  = 100,
                 problems    = false,
                 }
 
-function self.updateData()
-    self.data.isOn       = self.checkStatus()
-    self.data.output     = self.checkOutput()
-    self.data.durability = self.checkDurability()
-    self.data.problems   = self.checkProblems()
-end
--------------------------------------------------------------------
+ function GtMachine:updateData()
+     self.data.isOn       = self.checkStatus()
+     self.data.output     = self.checkOutput()
+     self.data.durability = self.checkDurability()
+     self.data.problems   = self.checkProblems()
+ end
+-------------------------------------------------------------------]]
 
 function GtMachine:new(addr)
     self.__index = self

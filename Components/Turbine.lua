@@ -60,7 +60,7 @@ end --end Shutdown
 
 function Turbine.safetySwitch() --logic for turning off the turbine
     if Turbine.data.durability <= SAFETY_THRESHOLD then Turbine.shutdown()
-    else return
+    else redstone.setOutput({ 15,  15,  15,  15,  15,  15})
     end
 end --end safetySwitch
 
