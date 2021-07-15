@@ -10,20 +10,21 @@ package.loaded["Components\\Graphic"]   = nil
 package.loaded["Components\\GtMachine"] = nil
 package.loaded["Components\\Reactor"]   = nil
 package.loaded["Components\\LSC"]       = nil
+package.loaded["components\\Turbine"]   = nil
 
 ------------Initilized Values------------
 local event     = require("event")
 local keyboard  = require("keyboard")
 local thread    = require("thread")
 local component = require("component")
+local computer  = require("computer")
 
 local Functions = require("Util\\Functions")
+local Graphic   = require("Components\\Graphic")
 
 local LSC       = require("Components\\LSC")
 local Reactor   = require("Components\\Reactor")
-local Graphic   = require("Components\\Graphic")
-
-local computer  = require("computer")
+local Turbine   = require("Components\\Turbine")
 
 local gpu       = component.gpu
 
@@ -78,6 +79,7 @@ end
 local function mainUpdate()
     Graphic.updateCleanroomStatus(4, 3)
     Graphic.updateEBFStatus(4, 7)
+    Graphic.drawStatusTile('Turbine',Turbine.data, 17, 3)
     --Graphic.updateOvenStatus(ovenA, "A", 17, 3)
     --Graphic.updateOvenStatus(ovenB, "B", 17, 7)
     --Graphic.updateOvenStatus(ovenC, "C", 17, 11)
@@ -86,8 +88,8 @@ end --end MainUpdate
 local function slowUpdate()
     LSC.updateData()
     Reactor.updateData()
+    Turbine.updateData()
     Graphic.updatePowerData()
-    Graphic.drawStatusTile('Turbine',Turbine.data, 17, 3)
 end --end slowUpdate
 
 local function calcData()
