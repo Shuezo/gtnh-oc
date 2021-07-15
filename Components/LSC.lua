@@ -20,7 +20,8 @@ LSC.data = {
                 Pcharge     = 0,
                 capacity    = 0,
                 ref         = {0,0},   -- 1st is current, 2nd is also current (unless changed)
-                time        = ""
+                time        = "",
+                problems    = false,
             }
 
 function LSC.updateData()
