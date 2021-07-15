@@ -19,7 +19,7 @@ local SAFETY_THRESHOLD = 2
 
 Turbine.data  = {
                 isOn        = nil,
-                output      = "",
+                output      = 0,
                 durability  = 100,
                 problems    = false,
                 }
@@ -34,7 +34,7 @@ end --end updateData
 ---- Turbine Telemetry ----
 
 function Turbine.checkOutput() --returns unformatted string with EU output
-    return string.sub(Turbine.getSensorInformation()[1], 27, 30)
+    return tonumber(string.sub(Turbine.getSensorInformation()[1], 27, 30))
 end --end checkOutput
 
 function Turbine.checkProblems() -- returns boolean if problems exist or not.
@@ -44,7 +44,7 @@ function Turbine.checkProblems() -- returns boolean if problems exist or not.
 end --end checkProblems
 
 function Turbine.checkDurability() --returns unformattted string representing percentile durability (0-100)
-    return string.sub(Turbine.getSensorInformation()[7], 20, 21) 
+    return tonumber(string.sub(Turbine.getSensorInformation()[7], 20, 21))
 end --end checkDurability
 
 
