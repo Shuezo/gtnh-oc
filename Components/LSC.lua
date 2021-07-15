@@ -30,11 +30,8 @@ function LSC.updateData()
     LSC.data.input          = LSC.getEUInputAverage()
     LSC.data.output         = LSC.getEUOutputAverage()
     LSC.data.Pcharge        = LSC.data.charge / LSC.data.capacity
+    LSC.data.problems       = LSC.checkProblems()
 end --end updateData
-
---function LSC.checkBatteryLevel()
---    return 
---end -- end checkBatteryLevel
 
 function LSC.calcData() --manipulates battery data from battery buffer
     local tmpData = LSC.data
@@ -79,5 +76,9 @@ function LSC.timeRemaining() -- calculates time remaining for battery to fill/em
     LSC.data.time = t
     
 end --end timeRemaining
+
+function LSC.checkProblems() -- returns boolean if problems exist or not.
+    return LSC.getSensorInformation()[2] ~= '§aNo Maintenance issues§r'
+end --end checkProblems
 
 return LSC

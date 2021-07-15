@@ -46,20 +46,17 @@ function Turbine.checkProblems() -- returns boolean if problems exist or not.
 end --end checkProblems
 
 function Turbine.checkDurability() --returns unformattted string representing percentile durability (0-100)
+    Turbine.switch()
     return tonumber(string.sub(Turbine.getSensorInformation()[7], 20, 21))
 end --end checkDurability
 
 
 ---- Turbine Logic Control ----
 
-function Turbine.shutdown() --shuts down the turbine by removing a redstone signal (presumably controlling a pump)
-    local redstoneOff = { 0,  0,  0,  0,  0,  0}
-    redstone.setOutput(redstoneOff)
-    Turbine.data.isOn = false
-end --end Shutdown
-
-function Turbine.safetySwitch() --logic for turning off the turbine
-    if Turbine.data.durability <= SAFETY_THRESHOLD then Turbine.shutdown()
+function Turbine.switch() --logic for turning off the turbine
+    if Turbine.data.durability <= SAFETY_THRESHOLD then
+        redstone.setOutput({ 0,  0,  0,  0,  0,  0})
+        Turbine.data.isOn = false
     else redstone.setOutput({ 15,  15,  15,  15,  15,  15})
     end
 end --end safetySwitch
