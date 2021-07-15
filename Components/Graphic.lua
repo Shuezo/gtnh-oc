@@ -84,10 +84,10 @@ function Graphic.drawStatusTile(title, machine, x, y)
     Graphic.drawBox(COLOR.darkGrey, x, y, x+10, y+2)
     gpu.setBackground(COLOR.darkGrey)
     gpu.setForeground(COLOR.darkAqua)
-    gpu.set(x+5,y,Functions.centerText(title))
+    gpu.set(Functions.centerText(x+5, title), y, title)
     gpu.setForeground(COLOR.white)
     gpu.set(x,y+1,"  Status:  ")
-    if not machine.problems and machine.isOn == true then
+    if not machine.problems and machine.isOn then
         gpu.setForeground(COLOR.green)
         gpu.set(x,y+2,"    OK     ")
     elseif not machine.problems and not machine.isOn then
@@ -189,9 +189,6 @@ function Graphic.updateReactorBar(level, label, x, y, barHeight, fillColor, empt
 
     gpu.setBackground(COLOR.black)
 end --end UpdateReactorBar
-
-------------Turbine Functions------------
-
 
 ------------Cleanroom Functions------------
 

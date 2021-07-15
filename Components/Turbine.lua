@@ -33,14 +33,16 @@ end --end updateData
 
 ---- Turbine Telemetry ----
 
+function Turbine.status()
+    return Turbine.isMachineActive()
+end --end check if machine is on
+
 function Turbine.checkOutput() --returns unformatted string with EU output
     return tonumber(string.sub(Turbine.getSensorInformation()[1], 27, 30))
 end --end checkOutput
 
 function Turbine.checkProblems() -- returns boolean if problems exist or not.
-    if string.sub(Turbine.getSensorInformation()[2]) == '§aNo Maintenance Issues§r' then return false
-    else return true
-    end
+    return Turbine.getSensorInformation()[2] ~= '§aNo Maintenance Issues§r'
 end --end checkProblems
 
 function Turbine.checkDurability() --returns unformattted string representing percentile durability (0-100)
