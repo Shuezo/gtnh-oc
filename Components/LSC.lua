@@ -22,7 +22,7 @@ LSC.data      = {
                 capacity    = 0,
                 ref         = {0,0},   -- 1st is current, 2nd is also current (unless changed)
                 time        = "",
-                problems    = false, --TODO TO BE IMPLEMENTED
+                problems    = false,
                 }
 
 function LSC.updateData()
@@ -65,14 +65,17 @@ function LSC.timeRemaining() -- calculates time remaining for battery to fill/em
         m = (t % 3600) / 60
         h = t / 3600
         t = string.format("%.0fh %.0fm %.0fs to empty   ", h, m, s)
-    elseif u == 0 then
-        t = "No load                          "
-    else
+    elseif u > 0 then
         t = (LSC.data.capacity - LSC.data.charge) / u / 20 --time=(maxCharge-currentCharge/Usage)*conversion from ticks to seconds
         s = t % 60
         m = (t % 3600) / 60
         h = t / 3600
         t = string.format("%.0fh %.0fm %.0fs to full    ", h, m, s)
+    elseif u == 0 then
+        t = "No load                          "
+    elseif u > 0 and LSC.data.Pcharge > 0.9999 then
+        t = "Battery Full                     "
+    else t = "Error"
     end
 
     LSC.data.time = t

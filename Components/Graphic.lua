@@ -80,13 +80,13 @@ function Graphic.drawExit(x,y)
     gpu.setForeground(fg)
 end --end drawExit
 
-function Graphic.drawStatusTile(title, machine, x, y)
+function Graphic.drawStatusTile(lineOne, lineTwo, machine, x, y)
     Graphic.drawBox(COLOR.darkGrey, x, y, x+10, y+2)
     gpu.setBackground(COLOR.darkGrey)
     gpu.setForeground(COLOR.darkAqua)
-    gpu.set(Functions.centerText(x+5, title), y, title)
+    gpu.set(Functions.centerText(x+5, lineOne), y, lineOne)
     gpu.setForeground(COLOR.white)
-    gpu.set(x,y+1,"  Status:  ")
+    gpu.set(Functions.centerText(x+5, lineTwo), y+1, lineTwo)
     if not machine.problems and machine.isOn then
         gpu.setForeground(COLOR.green)
         gpu.set(x,y+2,"    OK     ")

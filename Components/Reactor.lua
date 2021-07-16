@@ -18,7 +18,8 @@ local redstone  = component.proxy("ac6e4538-fea3-44e0-ac6d-9820e915bc7e")
 -------------------------------------------------------------------------
 
 local NUM_RODS              = 14 --total number of fuel rods across all reactors in setup
-local ON_THRESHOLD          = 0.90 --enter as a decimal value
+local NUM_REACTORS          = 2 -- total number of reactors chained together simultaneaously outputing the same EU
+local ON_THRESHOLD          = 0.80 --enter as a decimal value
 local OFF_THRESHOLD         = 0.99
 
 Reactor.data  = {
@@ -63,12 +64,12 @@ end --end switch
 
 
 ------- Other Functions -------
-function Reactor.checkHeatLevel()
+function Reactor.checkHeatLevel() --returns percentage heat in system.
     return Reactor.getHeat() / Reactor.getMaxHeat()
 end --end checkHeat
 
-function Reactor.checkOutput()
-    return Reactor.getReactorEUOutput()
+function Reactor.checkOutput() --returns EU output for two reactors
+    return Reactor.getReactorEUOutput() * NUM_REACTORS 
 end --end checkOutput
 
 
