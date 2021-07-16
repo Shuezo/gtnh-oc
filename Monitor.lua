@@ -79,7 +79,7 @@ end
 local function mainUpdate()
     Graphic.updateCleanroomStatus(4, 3)
     Graphic.updateEBFStatus(4, 7)
-    Graphic.drawStatusTile('Turbine',string.format(Turbine.data.durability .. '%'), Turbine.data, 17, 3)
+    Graphic.drawStatusTile('Turbine', string.format('%d%%', Turbine.data.durability), Turbine.data, 17, 3)
     Graphic.drawStatusTile('LSC', 'Status:', LSC.data, 30, 3)
     --Graphic.drawStatusTile('Cleanroom',Cleanroom.data, 4, 3)
     --Graphic.updateOvenStatus(ovenA, "A", 17, 3)

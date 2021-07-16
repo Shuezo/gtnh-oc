@@ -47,7 +47,7 @@ end --end checkProblems
 
 function Turbine.checkDurability() --returns unformattted string representing percentile durability (0-100)
     Turbine.switch()
-    return tonumber(string.sub(Turbine.getSensorInformation()[7], 20, 21))
+    return 100 - tonumber(string.sub(Turbine.getSensorInformation()[7], 20, 21))
 end --end checkDurability
 
 
