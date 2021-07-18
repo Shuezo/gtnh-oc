@@ -18,7 +18,7 @@ local Reactor   = require("Components\\Reactor")
 local LSC       = require("Components\\LSC")
 local Cleanroom = GtMachine:new("49e22d69-9915-43af-95e4-12385c4d6867")
 local EBF       = GtMachine:new("c1b4311d-993d-4d9b-8da0-71c97f8e003b")
-local oven      = GtMachine:new("334293f4-3981-4b08-b15a-6ed50b6eb292")
+--local oven      = GtMachine:new("334293f4-3981-4b08-b15a-6ed50b6eb292")
 
 local gpu       = component.gpu
 
@@ -198,10 +198,10 @@ function Graphic.updateCleanroomStatus(x, y)
     gpu.set(x,y," Cleanroom ")
     gpu.setForeground(COLOR.white)
     gpu.set(x,y+1,"  Status:  ")
-    if Cleanroom:getProblems() == '0' and Cleanroom:status() == true then
+    if not Cleanroom:hasProblems() and Cleanroom:isMachineActive() then
         gpu.setForeground(COLOR.green)
         gpu.set(x,y+2,"    OK     ")
-    elseif Cleanroom:getProblems() == '0' and Cleanroom:status() == false then
+    elseif not Cleanroom:hasProblems() and not Cleanroom:isMachineActive() then
         gpu.setForeground(COLOR.red)
         gpu.set(x,y+2," Inactive! ")
     else
@@ -219,12 +219,12 @@ function Graphic.updateEBFStatus(x, y)
     gpu.setForeground(COLOR.darkAqua)
     gpu.set(x,y,"    EBF    ")
     gpu.setForeground(COLOR.white)
-    if EBF:getProblems() ~= '0' then
+    if EBF:hasProblems() then
         gpu.setForeground(COLOR.red)
         gpu.set(x,y+1," Problems! ")
         return
     else
-        if EBF:status() == true then
+        if EBF:isMachineActive() == true then
             local tally = 0
             local task = EBF:craftingStatus()
             gpu.set(x,y+1,"  Active:  ")
@@ -246,10 +246,10 @@ function Graphic.updateOvenStatus(id, m, x, y)
     gpu.set(x,y,string.format("  Oven \"%s\" ", m))
     gpu.setForeground(COLOR.white)
     gpu.set(x,y+1,"  Status:  ")
-    if id:getProblems() == '0' and id:status() == true then
+    if not id:hasProblems() and id:isMachineActive() == true then
         gpu.setForeground(COLOR.green)
         gpu.set(x,y+2,"    OK     ")
-    elseif id:getProblems() == '0' and id:status() == false then
+    elseif not id:hasProblems() and id:isMachineActive() == false then
         gpu.setForeground(COLOR.red)
         gpu.set(x,y+2," Inactive! ")
     else

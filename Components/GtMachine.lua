@@ -21,7 +21,7 @@ function GtMachine:new(addr)
                     problems    = false,
                 }
 
-    return setmetatable(component.proxy(addr), self)
+    return setmetatable(component.proxy(addr) or {}, self)
 end
 
 function GtMachine:updateData()
@@ -31,17 +31,13 @@ function GtMachine:updateData()
     self.data.problems   = self.checkProblems()
 end
 
-function GtMachine:status()
-    return self.isMachineActive()
-end --end check if machine is on
-
-function GtMachine:getProblems()
+function GtMachine:hasProblems()
     if string.sub(self.getSensorInformation()[5], 14, 14) == '0' then return false
     elseif self.getSensorInformation()[2] == '§aNo Maintenance issues§r' then return false
     elseif self.getSensorInformation()[9] == 'Maintenance Status: §aWorking perfectly§r' then return false
     else return true
     end
-end --end getProblems
+end --end hasProblems
 
 function GtMachine:craftingStatus()
     return string.format(" %3.0fs/%3.0fs ", self.getWorkProgress() / 20, self.getWorkMaxProgress() / 20 )
