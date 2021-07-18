@@ -30,9 +30,10 @@ function GtMachine:updateData()
 end
 
 function GtMachine:hasProblems()
-    if string.sub( self.getSensorInformation()[5], 14, 14 ) == '0' then return false
+    if string.sub( self.getSensorInformation()[5], 11, 17 ) == '§c0§r' then return false
     elseif self.getSensorInformation()[2] == '§aNo Maintenance issues§r' then return false
     elseif self.getSensorInformation()[9] == 'Maintenance Status: §aWorking perfectly§r' then return false
+    elseif self.getSensorInformation()[31] == 'Maintenance Status: §aWorking perfectly§r' then return false
     else return true
     end
 end --end hasProblems

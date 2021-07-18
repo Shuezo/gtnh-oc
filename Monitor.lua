@@ -91,10 +91,12 @@ end --end MainUpdate
 
 local function dataUpdate()
     LSC.updateData()
+    Graphic.updatePowerData()
     Reactor.updateData()
     Turbine.updateData()
-    Graphic.updatePowerData()
     Cleanroom:updateData()
+    EBF:updateData()
+    TFFT:updateData()
 end --end dataUpdate
 
 local function calcData()
