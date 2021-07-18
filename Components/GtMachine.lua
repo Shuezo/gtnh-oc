@@ -15,9 +15,9 @@ local Functions = require("Util\\Functions")
 function GtMachine:new(addr)
     local o = component.proxy(addr)
     o.data = {
-                isOn = false,
+                isOn = nil,
                 output = 0,
-                problems = false
+                problems = nil,
              }
              
     setmetatable(o, self)

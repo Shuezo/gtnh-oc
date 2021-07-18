@@ -191,6 +191,5 @@ Functions.clearScreen()
 
 --clean up globals
 W, H, COLOR = nil, nil, nil
-collectgarbage()
 
 os.exit()
