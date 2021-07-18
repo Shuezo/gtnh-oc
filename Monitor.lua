@@ -29,7 +29,7 @@ local LSC       = require("Components\\LSC")
 local Reactor   = require("Components\\Reactor")
 local Turbine   = require("Components\\Turbine")
 local Cleanroom = GtMachine:new("49e22d69-9915-43af-95e4-12385c4d6867")
-local EBF       = GtMachine:new("c1b4311d-993d-4d9b-8da0-71c97f8e003b")
+local EBF       = GtMachine:new("c3440dd2-ba1e-4ea9-abfd-7a63e85d3ad2")
 local TFFT      = GtMachine:new("80e4e927-0901-465c-aafd-122c2373fb19")
 
 ------------Initilized Values------------

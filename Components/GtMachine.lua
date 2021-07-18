@@ -14,19 +14,15 @@ local Functions = require("Util\\Functions")
 
 function GtMachine:new(addr)
     self.__index = self
-    self.data = {
-                    isOn        = nil,
-                    output      = 0,
-                    problems    = nil,
-                }
-
     return setmetatable(component.proxy(addr) or {}, self)
 end
 
 function GtMachine:updateData()
-    self.data.isOn       = self.isMachineActive()
-    self.data.output     = self.getEUOutputAverage()
-    self.data.problems   = self:hasProblems()
+    self.data = {
+            isOn       = self.isMachineActive(),
+            output     = self.getEUOutputAverage(),
+            problems   = self:hasProblems(),
+                }
 end
 
 function GtMachine:hasProblems()
