@@ -12,25 +12,23 @@ local math      = require("math")
 local string    = require("string")
 local Functions = require("Util\\Functions")
 
---[[----------------------------------------------------------------
-self.data     = {
-                isOn        = nil,
-                output      = 0,
-                durability  = 100,
-                problems    = false,
-                }
-
- function GtMachine:updateData()
-     self.data.isOn       = self.checkStatus()
-     self.data.output     = self.checkOutput()
-     self.data.durability = self.checkDurability()
-     self.data.problems   = self.checkProblems()
- end
--------------------------------------------------------------------]]
-
 function GtMachine:new(addr)
     self.__index = self
+    self.data = {
+                    isOn        = nil,
+                    output      = 0,
+                    durability  = 100,
+                    problems    = false,
+                }
+
     return setmetatable(component.proxy(addr), self)
+end
+
+function GtMachine:updateData()
+    self.data.isOn       = self.checkStatus()
+    self.data.output     = self.checkOutput()
+    self.data.durability = self.checkDurability()
+    self.data.problems   = self.checkProblems()
 end
 
 function GtMachine:status()
@@ -38,7 +36,11 @@ function GtMachine:status()
 end --end check if machine is on
 
 function GtMachine:getProblems()
-    return string.sub(self.getSensorInformation()[5], 14, 14)
+    if string.sub(self.getSensorInformation()[5], 14, 14) == '0' then return false
+    elseif self.getSensorInformation()[2] == '§aNo Maintenance issues§r' then return false
+    elseif self.getSensorInformation()[9] == 'Maintenance Status: §aWorking perfectly§r' then return false
+    else return true
+    end
 end --end getProblems
 
 function GtMachine:craftingStatus()
