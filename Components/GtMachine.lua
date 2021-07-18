@@ -37,7 +37,7 @@ end --end hasProblems
 
 function GtMachine:craftingStatus()
     if self.getWorkMaxProgress() ~= 0.0 then return string.format(" %3.0fs/%3.0fs ", self.getWorkProgress() / 20, self.getWorkMaxProgress() / 20 )
-    else return " Inactive. " end
+    else return "" end
 end --end craftingStatus
 
 --[[
