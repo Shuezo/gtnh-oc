@@ -84,7 +84,10 @@ function Graphic.drawStatusTile(lineOne, lineTwo, machine, x, y)
     gpu.set(Functions.centerText(x+5, lineOne), y, lineOne)
     gpu.setForeground(COLOR.white)
     gpu.set(Functions.centerText(x+5, lineTwo), y+1, lineTwo)
-    if not machine.problems and machine.isOn then
+    if machine.problems == nil then
+        gpu.setForeground(COLOR.red)
+        gpu.set(x,y+2,"   Error   ")
+    elseif not machine.problems and machine.isOn then
         gpu.setForeground(COLOR.green)
         gpu.set(x,y+2,"    OK.    ")
     elseif not machine.problems and not machine.isOn then

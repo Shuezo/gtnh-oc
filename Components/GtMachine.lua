@@ -17,7 +17,7 @@ function GtMachine:new(addr)
     self.data = {
                     isOn        = nil,
                     output      = 0,
-                    problems    = false,
+                    problems    = nil,
                 }
 
     return setmetatable(component.proxy(addr) or {}, self)
@@ -30,10 +30,10 @@ function GtMachine:updateData()
 end
 
 function GtMachine:hasProblems()
-    if string.sub( self.getSensorInformation()[5], 11, 17 ) == '§c0§r' then return false
-    elseif self.getSensorInformation()[2] == '§aNo Maintenance issues§r' then return false
-    elseif self.getSensorInformation()[9] == 'Maintenance Status: §aWorking perfectly§r' then return false
-    elseif self.getSensorInformation()[31] == 'Maintenance Status: §aWorking perfectly§r' then return false
+    if string.sub( self.getSensorInformation()[5], 13, 14 ) == 'c0' then return false                       --Cleanroom, EBF
+    elseif self.getSensorInformation()[2] == '§aNo Maintenance issues§r' then return false                  --Turbine
+    elseif self.getSensorInformation()[9] == 'Maintenance Status: §aWorking perfectly§r' then return false  --LSC
+    elseif self.getSensorInformation()[31] == 'Maintenance Status: §aWorking perfectly§r' then return false --TFFT
     else return true
     end
 end --end hasProblems
