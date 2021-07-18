@@ -10,14 +10,12 @@ local Graphic = {}
 local component = require("component")
 local term      = require("term")
 local string    = require("string")
+local gpu       = component.gpu
 
 local Functions = require("Util\\Functions")
 local GtMachine = require("Components\\GtMachine")
-
 local Reactor   = require("Components\\Reactor")
 local LSC       = require("Components\\LSC")
-
-local gpu       = component.gpu
 
 ------------Generic Functions------------
 
@@ -86,7 +84,7 @@ function Graphic.drawStatusTile(lineOne, lineTwo, machine, x, y)
     gpu.set(Functions.centerText(x+5, lineTwo), y+1, lineTwo)
     if machine.problems == nil then
         gpu.setForeground(COLOR.red)
-        gpu.set(x,y+2,"   Error   ")
+        gpu.set(x,y+2,"   Null.   ")
     elseif not machine.problems and machine.isOn then
         gpu.setForeground(COLOR.green)
         gpu.set(x,y+2,"    OK.    ")
@@ -189,31 +187,5 @@ function Graphic.updateReactorBar(level, label, x, y, barHeight, fillColor, empt
 
     gpu.setBackground(COLOR.black)
 end --end UpdateReactorBar
-
-------------EBF Functions------------
-
-function Graphic.updateEBFStatus(x, y)
-    gpu.setBackground(COLOR.darkGrey)
-    gpu.setForeground(COLOR.darkAqua)
-    gpu.set(x,y,"    EBF    ")
-    gpu.setForeground(COLOR.white)
-    if EBF:hasProblems() then
-        gpu.setForeground(COLOR.red)
-        gpu.set(x,y+1," Problems! ")
-        return
-    else
-        if EBF:isMachineActive() == true then
-            local tally = 0
-            local task = EBF:craftingStatus()
-            gpu.set(x,y+1,"  Active:  ")
-            gpu.set(x,y+2,task)
-        else
-            gpu.set(x,y+1," Inactive. ")
-            gpu.set(x,y+2,"           ")
-        end
-    end
-    gpu.setForeground(COLOR.white)
-    gpu.setBackground(COLOR.black)
-end --end updateEBFstatus
 
 return Graphic
