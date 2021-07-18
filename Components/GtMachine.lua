@@ -19,7 +19,8 @@ function GtMachine:new(addr)
                 output = 0,
                 problems = false
              }
-
+             
+    setmetatable(o, self)
     self.__index = self
 
     return o
