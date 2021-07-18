@@ -121,8 +121,8 @@ local function stopTimers(tbl)
 end
 
 local function startTimers()
-    timers[dataUpdate]      = event.timer(8,    resume(threads[dataUpdate]),    math.huge)
-    timers[mainUpdate]      = event.timer(2,    resume(threads[mainUpdate]),    math.huge)
+    timers[dataUpdate]      = event.timer(4,    resume(threads[dataUpdate]),    math.huge)
+    timers[mainUpdate]      = event.timer(1,    resume(threads[mainUpdate]),    math.huge)
     timers[calcData]        = event.timer(0.5,  resume(threads[calcData]),      math.huge)
     timers[updateBars]      = event.timer(0.5,  resume(threads[updateBars]),    math.huge)
     timers[controlPower]    = event.timer(2,    resume(threads[controlPower]),  math.huge)
