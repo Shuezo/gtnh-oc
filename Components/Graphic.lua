@@ -16,8 +16,6 @@ local GtMachine = require("Components\\GtMachine")
 
 local Reactor   = require("Components\\Reactor")
 local LSC       = require("Components\\LSC")
-local EBF       = GtMachine:new("c1b4311d-993d-4d9b-8da0-71c97f8e003b")
---local oven      = GtMachine:new("334293f4-3981-4b08-b15a-6ed50b6eb292")
 
 local gpu       = component.gpu
 

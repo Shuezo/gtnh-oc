@@ -11,7 +11,7 @@ local Functions = require("Util\\Functions")
 local GtMachine = require("Components\\GtMachine")
 
 -------------------------------------------------------------------------
-local LSC       = component.proxy("1cc48397-5b2c-4b14-adba-d6df1b8111be")
+local LSC       = GtMachine:new("1cc48397-5b2c-4b14-adba-d6df1b8111be")
 -------------------------------------------------------------------------
 LSC.data      = {
                 isOn        = 0,
@@ -26,13 +26,13 @@ LSC.data      = {
                 }
 
 function LSC.updateData()
-    LSC.data.isOn           = LSC.status()
+    LSC.data.isOn           = LSC.isMachineActive()
     LSC.data.charge         = LSC.getEUStored()
     LSC.data.capacity       = LSC.getEUMaxStored()
     LSC.data.input          = LSC.getEUInputAverage()
     LSC.data.output         = LSC.getEUOutputAverage()
     LSC.data.Pcharge        = LSC.data.charge / LSC.data.capacity
-    LSC.data.problems       = LSC.checkProblems()
+    LSC.data.problems       = LSC:hasProblems()
 end --end updateData
 
 function LSC.calcData() --manipulates battery data from battery buffer
@@ -73,7 +73,7 @@ function LSC.timeRemaining() -- calculates time remaining for battery to fill/em
         t = string.format("%.0fh %.0fm %.0fs to full    ", h, m, s)
     elseif u == 0 then
         t = "No load                          "
-    elseif u > 0 and LSC.data.Pcharge > 0.9999 then
+    elseif u > 0 and LSC.data.Pcharge > 0.999 then
         t = "Battery Full                     "
     else t = "Error"
     end
@@ -81,13 +81,5 @@ function LSC.timeRemaining() -- calculates time remaining for battery to fill/em
     LSC.data.time = t
     
 end --end timeRemaining
-
-function LSC.status()
-    return LSC.isMachineActive()
-end --end check if machine is on
-
-function LSC.checkProblems() -- returns boolean if problems exist or not.
-    return LSC.getSensorInformation()[9] ~= 'Maintenance Status: §aWorking perfectly§r'
-end --end checkProblems
 
 return LSC

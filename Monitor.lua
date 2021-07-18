@@ -12,24 +12,27 @@ package.loaded["Components\\Reactor"]   = nil
 package.loaded["Components\\LSC"]       = nil
 package.loaded["Components\\Turbine"]   = nil
 
-------------Initilized Values------------
+------------Includes------------
 local event     = require("event")
 local keyboard  = require("keyboard")
 local thread    = require("thread")
 local component = require("component")
 local computer  = require("computer")
+local gpu       = component.gpu
 
 local Functions = require("Util\\Functions")
 local GtMachine = require("Components\\GtMachine")
 local Graphic   = require("Components\\Graphic")
 
+------------Compenents------------
 local LSC       = require("Components\\LSC")
 local Reactor   = require("Components\\Reactor")
 local Turbine   = require("Components\\Turbine")
 local Cleanroom = GtMachine:new("49e22d69-9915-43af-95e4-12385c4d6867")
+local EBF       = GtMachine:new("c1b4311d-993d-4d9b-8da0-71c97f8e003b")
+local TFFT      = GtMachine:new("80e4e927-0901-465c-aafd-122c2373fb19")
 
-local gpu       = component.gpu
-
+------------Initilized Values------------
 local threads   = {}
 local timers    = {}
 
@@ -79,14 +82,11 @@ end
 ---------Update Functions---------
 
 local function mainUpdate()
-    --Graphic.updateEBFStatus(4, 7)
-    Graphic.drawStatusTile('Turbine', string.format('%d%%', Turbine.data.durability), Turbine.data, 17, 3)
-    Graphic.drawStatusTile('L.S.C.', 'Status:', LSC.data, 30, 3)
     Graphic.drawStatusTile('Cleanroom', 'Status:', Cleanroom.data, 4, 3)
-    Graphic.drawStatusTile('E.B.F.', EBF:craftingStatus(), EBF.data, 4, 7)
-    --Graphic.updateOvenStatus(ovenA, "A", 17, 3)
-    --Graphic.updateOvenStatus(ovenB, "B", 17, 7)
-    --Graphic.updateOvenStatus(ovenC, "C", 17, 11)
+    Graphic.drawStatusTile('Turbine', string.format('%d%%', Turbine.data.durability), Turbine.data, 17, 3)
+    Graphic.drawStatusTile('LSC', 'Status:', LSC.data, 30, 3)
+    Graphic.drawStatusTile('TFFT', 'Status:', TFFT.data, 43, 3)
+    Graphic.drawStatusTile('EBF', EBF:craftingStatus(), EBF.data, 4, 7)
 end --end MainUpdate
 
 local function dataUpdate()
