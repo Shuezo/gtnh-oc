@@ -13,17 +13,22 @@ local string    = require("string")
 local Functions = require("Util\\Functions")
 
 function GtMachine:new(addr)
+    local o = component.proxy(addr)
+    o.data = {
+                isOn = false,
+                output = 0,
+                problems = false
+             }
+
     self.__index = self
-    self.data = {} -- table initialization
-    return setmetatable(component.proxy(addr) or {}, self)
+
+    return o
 end
 
 function GtMachine:updateData()
-    self.data = { --table reinitialization on function call. This removes previously stored data AFAIK
-            isOn       = self.isMachineActive(),
-            output     = self.getEUOutputAverage(),
-            problems   = self:hasProblems(),
-                }
+    self.data.isOn       = self.isMachineActive()
+    self.data.output     = self.getEUOutputAverage()
+    self.data.problems   = self:hasProblems()
 end
 
 function GtMachine:hasProblems()
