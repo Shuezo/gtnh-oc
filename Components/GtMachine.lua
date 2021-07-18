@@ -25,10 +25,10 @@ function GtMachine:new(addr)
 end
 
 function GtMachine:updateData()
-    self.data.isOn       = self.checkStatus()
+    self.data.isOn       = self.isMachineActive()
     self.data.output     = self.checkOutput()
     self.data.durability = self.checkDurability()
-    self.data.problems   = self.checkProblems()
+    self.data.problems   = self.hasProblems()
 end
 
 function GtMachine:hasProblems()

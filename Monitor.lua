@@ -25,6 +25,7 @@ local Graphic   = require("Components\\Graphic")
 local LSC       = require("Components\\LSC")
 local Reactor   = require("Components\\Reactor")
 local Turbine   = require("Components\\Turbine")
+local Cleanroom = GtMachine:new("49e22d69-9915-43af-95e4-12385c4d6867")
 
 local gpu       = component.gpu
 
@@ -77,22 +78,23 @@ end
 ---------Update Functions---------
 
 local function mainUpdate()
-    Graphic.updateCleanroomStatus(4, 3)
+    --Graphic.updateCleanroomStatus(4, 3)
     Graphic.updateEBFStatus(4, 7)
     Graphic.drawStatusTile('Turbine', string.format('%d%%', Turbine.data.durability), Turbine.data, 17, 3)
     Graphic.drawStatusTile('LSC', 'Status:', LSC.data, 30, 3)
-    --Graphic.drawStatusTile('Cleanroom',Cleanroom.data, 4, 3)
+    Graphic.drawStatusTile('Cleanroom', 'Status:', Cleanroom.data, 4, 3)
     --Graphic.updateOvenStatus(ovenA, "A", 17, 3)
     --Graphic.updateOvenStatus(ovenB, "B", 17, 7)
     --Graphic.updateOvenStatus(ovenC, "C", 17, 11)
 end --end MainUpdate
 
-local function slowUpdate()
+local function dataUpdate()
     LSC.updateData()
     Reactor.updateData()
     Turbine.updateData()
     Graphic.updatePowerData()
-end --end slowUpdate
+    Cleanroom:updateData()
+end --end dataUpdate
 
 local function calcData()
     LSC.calcData()
@@ -116,7 +118,7 @@ local function stopTimers(tbl)
 end
 
 local function startTimers()
-    timers[slowUpdate]      = event.timer(8,    resume(threads[slowUpdate]),    math.huge)
+    timers[dataUpdate]      = event.timer(8,    resume(threads[dataUpdate]),    math.huge)
     timers[mainUpdate]      = event.timer(2,    resume(threads[mainUpdate]),    math.huge)
     timers[calcData]        = event.timer(0.5,  resume(threads[calcData]),      math.huge)
     timers[updateBars]      = event.timer(0.5,  resume(threads[updateBars]),    math.huge)
@@ -147,7 +149,7 @@ local function startupFunction()
     Graphic.drawBox(COLOR.darkGrey,1,H-2,W,H) --draw background for power bars
     Graphic.drawExit(W, 1) --draw exit button
     createThreads(mainUpdate,
-                  slowUpdate,
+                  dataUpdate,
                   calcData,
                   updateBars,
                   controlPower)
