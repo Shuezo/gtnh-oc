@@ -16,7 +16,6 @@ local GtMachine = require("Components\\GtMachine")
 
 local Reactor   = require("Components\\Reactor")
 local LSC       = require("Components\\LSC")
-local Cleanroom = GtMachine:new("49e22d69-9915-43af-95e4-12385c4d6867")
 local EBF       = GtMachine:new("c1b4311d-993d-4d9b-8da0-71c97f8e003b")
 --local oven      = GtMachine:new("334293f4-3981-4b08-b15a-6ed50b6eb292")
 
@@ -89,7 +88,7 @@ function Graphic.drawStatusTile(lineOne, lineTwo, machine, x, y)
     gpu.set(Functions.centerText(x+5, lineTwo), y+1, lineTwo)
     if not machine.problems and machine.isOn then
         gpu.setForeground(COLOR.green)
-        gpu.set(x,y+2,"    OK     ")
+        gpu.set(x,y+2,"    OK.    ")
     elseif not machine.problems and not machine.isOn then
         gpu.setForeground(COLOR.red)
         gpu.set(x,y+2," Inactive! ")
@@ -190,28 +189,6 @@ function Graphic.updateReactorBar(level, label, x, y, barHeight, fillColor, empt
     gpu.setBackground(COLOR.black)
 end --end UpdateReactorBar
 
-------------Cleanroom Functions------------
-
-function Graphic.updateCleanroomStatus(x, y)
-    gpu.setBackground(COLOR.darkGrey)
-    gpu.setForeground(COLOR.darkAqua)
-    gpu.set(x,y," Cleanroom ")
-    gpu.setForeground(COLOR.white)
-    gpu.set(x,y+1,"  Status:  ")
-    if not Cleanroom:hasProblems() and Cleanroom:isMachineActive() then
-        gpu.setForeground(COLOR.green)
-        gpu.set(x,y+2,"    OK     ")
-    elseif not Cleanroom:hasProblems() and not Cleanroom:isMachineActive() then
-        gpu.setForeground(COLOR.red)
-        gpu.set(x,y+2," Inactive! ")
-    else
-        gpu.setForeground(COLOR.red)
-        gpu.set(x,y+2," Problems! ")
-    end
-    gpu.setForeground(COLOR.white)
-    gpu.setBackground(COLOR.black)
-end --end updateCleanroomStatus
-
 ------------EBF Functions------------
 
 function Graphic.updateEBFStatus(x, y)
@@ -237,27 +214,5 @@ function Graphic.updateEBFStatus(x, y)
     gpu.setForeground(COLOR.white)
     gpu.setBackground(COLOR.black)
 end --end updateEBFstatus
-
-------------Pyrolyse Oven Functions------------
-
-function Graphic.updateOvenStatus(id, m, x, y)
-    gpu.setBackground(COLOR.darkGrey)
-    gpu.setForeground(COLOR.darkAqua)
-    gpu.set(x,y,string.format("  Oven \"%s\" ", m))
-    gpu.setForeground(COLOR.white)
-    gpu.set(x,y+1,"  Status:  ")
-    if not id:hasProblems() and id:isMachineActive() == true then
-        gpu.setForeground(COLOR.green)
-        gpu.set(x,y+2,"    OK     ")
-    elseif not id:hasProblems() and id:isMachineActive() == false then
-        gpu.setForeground(COLOR.red)
-        gpu.set(x,y+2," Inactive! ")
-    else
-        gpu.setForeground(COLOR.red)
-        gpu.set(x,y+2," Problems! ")
-    end
-    gpu.setForeground(COLOR.white)
-    gpu.setBackground(COLOR.black)
-end --end updateOvenStatus
 
 return Graphic

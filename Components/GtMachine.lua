@@ -17,7 +17,6 @@ function GtMachine:new(addr)
     self.data = {
                     isOn        = nil,
                     output      = 0,
-                    durability  = 100,
                     problems    = false,
                 }
 
@@ -26,13 +25,12 @@ end
 
 function GtMachine:updateData()
     self.data.isOn       = self.isMachineActive()
-    self.data.output     = self.checkOutput()
-    self.data.durability = self.checkDurability()
-    self.data.problems   = self.hasProblems()
+    self.data.output     = self.getEUOutputAverage()
+    self.data.problems   = self:hasProblems()
 end
 
 function GtMachine:hasProblems()
-    if string.sub(self.getSensorInformation()[5], 14, 14) == '0' then return false
+    if string.sub( self.getSensorInformation()[5], 14, 14 ) == '0' then return false
     elseif self.getSensorInformation()[2] == '§aNo Maintenance issues§r' then return false
     elseif self.getSensorInformation()[9] == 'Maintenance Status: §aWorking perfectly§r' then return false
     else return true
@@ -40,7 +38,8 @@ function GtMachine:hasProblems()
 end --end hasProblems
 
 function GtMachine:craftingStatus()
-    return string.format(" %3.0fs/%3.0fs ", self.getWorkProgress() / 20, self.getWorkMaxProgress() / 20 )
+    if self.getWorkMaxProgress() ~= 0.0 then return string.format(" %3.0fs/%3.0fs ", self.getWorkProgress() / 20, self.getWorkMaxProgress() / 20 )
+    else return " Inactive. " end
 end --end craftingStatus
 
 --[[

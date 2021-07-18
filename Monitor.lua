@@ -20,6 +20,7 @@ local component = require("component")
 local computer  = require("computer")
 
 local Functions = require("Util\\Functions")
+local GtMachine = require("Components\\GtMachine")
 local Graphic   = require("Components\\Graphic")
 
 local LSC       = require("Components\\LSC")
@@ -78,11 +79,11 @@ end
 ---------Update Functions---------
 
 local function mainUpdate()
-    --Graphic.updateCleanroomStatus(4, 3)
-    Graphic.updateEBFStatus(4, 7)
+    --Graphic.updateEBFStatus(4, 7)
     Graphic.drawStatusTile('Turbine', string.format('%d%%', Turbine.data.durability), Turbine.data, 17, 3)
-    Graphic.drawStatusTile('LSC', 'Status:', LSC.data, 30, 3)
+    Graphic.drawStatusTile('L.S.C.', 'Status:', LSC.data, 30, 3)
     Graphic.drawStatusTile('Cleanroom', 'Status:', Cleanroom.data, 4, 3)
+    Graphic.drawStatusTile('E.B.F.', EBF:craftingStatus(), EBF.data, 4, 7)
     --Graphic.updateOvenStatus(ovenA, "A", 17, 3)
     --Graphic.updateOvenStatus(ovenB, "B", 17, 7)
     --Graphic.updateOvenStatus(ovenC, "C", 17, 11)
