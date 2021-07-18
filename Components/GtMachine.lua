@@ -30,22 +30,20 @@ self.data     = {
 
 function GtMachine:new(addr)
     self.__index = self
-    return setmetatable({controller = component.proxy(addr)}, self)
+    return setmetatable(component.proxy(addr), self)
 end
 
 function GtMachine:status()
-    return self.controller.isMachineActive()
+    return self.isMachineActive()
 end --end check if machine is on
 
 function GtMachine:getProblems()
-    return string.sub(self.controller.getSensorInformation()[5], 14, 14)
+    return string.sub(self.getSensorInformation()[5], 14, 14)
 end --end getProblems
 
 function GtMachine:craftingStatus()
-    return string.format(" %3.0fs/%3.0fs ", self.controller.getWorkProgress() / 20, self.controller.getWorkMaxProgress() / 20 )
+    return string.format(" %3.0fs/%3.0fs ", self.getWorkProgress() / 20, self.getWorkMaxProgress() / 20 )
 end --end craftingStatus
-
-
 
 --[[
     GtMachine:sensorInfo(args)
@@ -53,7 +51,7 @@ end --end craftingStatus
 ]]--
 function GtMachine:sensorInfo(...)
     local tbl = {}
-    local dat = self.controller.getSensorInformation()
+    local dat = self.getSensorInformation()
     local tmp, sub
 
     for i,v in ipairs({...}) do
