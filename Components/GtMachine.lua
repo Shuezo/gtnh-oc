@@ -13,7 +13,7 @@ local string    = require("string")
 local Functions = require("Util\\Functions")
 
 function GtMachine:new(addr)
-    local o = component.proxy(addr)
+    local o = component.proxy(addr) or {}
     o.data = {
                 isOn = nil,
                 output = 0,
