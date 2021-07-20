@@ -93,11 +93,7 @@ end
 local args, ops = shell.parse(...)
 local new = false
 local oldVer = {}
-
-if ops.b then
-    GIT.BRANCH = ops.b
-end
-
+local ver = {}
 
 if args[1] == "help" then
     print(  
@@ -113,13 +109,9 @@ if args[1] == "help" then
         )
     os.exit()
 
---Set new to true if new
-elseif args[1] == "new" then 
-    new = true
-
 --Update normally, check previous SHAs to new
-else 
-    local oldFile = io.open('sha')
+elseif args[1] ~= "new" then
+    local oldFile = io.open('/programs/'..GIT.REPO..'/sha','r')
     if oldFile == nil then 
         oldVer = {} 
     else
@@ -128,10 +120,14 @@ else
     end
 end
 
-if oldVer.branch ~= GIT.BRANCH then new = true end
+GIT.BRANCH  = ops.b or oldVer.branch or GIT.BRANCH
+new         = args[1] == "new" or oldVer.branch ~= GIT.BRANCH
+
+ver.branch  = GIT.BRANCH
 
 --To reinstall a program or force new if installing different branch
 if new then
+    print("Clean Reinstall\n")
     if exists("/programs/"..GIT.REPO.."/") then
         shell.execute("rm -r /programs/"..GIT.REPO.."/")
     end
@@ -145,8 +141,6 @@ if dat == nil then
 end
 
 --Download a file from each blob in the tree
-local ver = {}
-ver.branch = GIT.BRANCH
 local updates = 0
 
 for _, file in pairs(dat.tree) do
@@ -154,7 +148,7 @@ for _, file in pairs(dat.tree) do
         ver[file.path] = file.sha
         if new or ver[file.path] ~= oldVer[file.path] then
             if updates == 0 then
-                print("Fetching "..GIT.BRANCH.." branch from "..GIT.NAME.."/"..GIT.REPO)
+                print("Fetching "..ver.branch.." branch from "..GIT.NAME.."/"..GIT.REPO.."\n")
             end
             updates = updates + 1
             downloadFile(file.path)
@@ -162,7 +156,7 @@ for _, file in pairs(dat.tree) do
     end
 end
 
-local file = io.open('sha','w')
+local file = io.open('/programs/'..GIT.REPO..'/sha','w')
 file:write(json.encode(ver))
 file:close()
 
