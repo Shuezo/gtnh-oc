@@ -147,9 +147,6 @@ for _, file in pairs(dat.tree) do
     if file.type == "blob" then
         ver[file.path] = file.sha
         if new or ver[file.path] ~= oldVer[file.path] then
-            if updates == 0 then
-                print("Fetching "..ver.branch.." branch from "..GIT.NAME.."/"..GIT.REPO.."\n")
-            end
             updates = updates + 1
             downloadFile(file.path)
         end
@@ -160,4 +157,5 @@ local file = io.open('/programs/'..GIT.REPO..'/sha','w')
 file:write(json.encode(ver))
 file:close()
 
+print("Fetched "..ver.branch.." branch from "..GIT.NAME.."/"..GIT.REPO.."\n")
 print("\nUpdated "..updates.." file(s).")
