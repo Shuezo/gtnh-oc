@@ -2,7 +2,7 @@
 Date: 2021/06/22 
 Author: A. Jones & S. Huezo
 Version: 1.0
-Usage: To be used in conjunction with Monitor.lua
+Usage: Handles general parsing of the component API from gregtech machines
 ]]--
 ------------Variables------------
 local GtMachine = {}
@@ -13,6 +13,7 @@ local string    = require("string")
 local Functions = require("Util\\Functions")
 
 function GtMachine:new(addr)
+    
     local o = component.proxy(addr)
     o.data = {
                 isOn = nil,

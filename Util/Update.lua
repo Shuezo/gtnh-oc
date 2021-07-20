@@ -24,8 +24,7 @@ local function exists(dir)
     return status ~= nil
 end
 
---gets HTTP data and returns it in a table
-local function getHTTPData(url)
+function getHTTPData(url) --gets HTTP data and returns it in a table
     local dat = ""
     local req, resp = pcall(internet.request, url)
 
@@ -40,7 +39,8 @@ local function getHTTPData(url)
         print("Could not connect to "..url)
         return nil
     end
-end
+end --end getHTTPdata
+
 
 --[[
 Split up directory and file from the filepath
