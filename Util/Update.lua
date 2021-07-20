@@ -7,8 +7,9 @@ Author: Sean Huezo
 local GIT = {}
 GIT.NAME = "Shuezo"
 GIT.REPO = "gtnh-oc"
-GIT.REPO_URL = "https://api.github.com/repos/"..GIT.NAME.."/"..GIT.REPO.."/git/trees/master"
-GIT.FILE_URL = "https://raw.githubusercontent.com/"..GIT.NAME.."/"..GIT.REPO.."/master"
+GIT.BRANCH = "master"
+GIT.REPO_URL = "https://api.github.com/repos/"..GIT.NAME.."/"..GIT.REPO.."/git/trees/"
+GIT.FILE_URL = "https://raw.githubusercontent.com/"..GIT.NAME.."/"..GIT.REPO.."/"
 
 local shell = require("shell")
 local internet = require("internet")
@@ -24,21 +25,27 @@ local function exists(dir)
     return status ~= nil
 end
 
-function getHTTPData(url) --gets HTTP data and returns it in a table
+local function getHTTPData(url) --gets HTTP data and returns it in a table
     local dat = ""
     local req, resp = pcall(internet.request, url)
+    
+    if req then
+        local code, _, _ = resp.response()
 
-    if(req) then
-        local tmp = resp()
-        while tmp ~= nil do -- Add response buffer to dat
-            dat = dat..tmp
-            tmp = resp()
+        if code == 200 then
+            local tmp = resp()
+            while tmp ~= nil do -- Add response buffer to dat
+                dat = dat..tmp
+                tmp = resp()
+            end
+
+            return json.decode(dat) --Return decoded json data
         end
-        return json.decode(dat) --Return decoded json data
-    else
-        print("Could not connect to "..url)
-        return nil
     end
+
+    print("Could not connect to:\n"..url)
+    return nil
+
 end --end getHTTPdata
 
 
@@ -70,7 +77,7 @@ end
 --Download a file from a github api path and save it to '/programs/repo/'
 local function downloadFile(path)
     local dir, file = splitFile(path)
-    local fullUrl = GIT.FILE_URL.."/"..path
+    local fullUrl = GIT.FILE_URL..GIT.BRANCH.."/"..path
     local dirPath = '/programs/'..GIT.REPO.."/"..dir
     
     if not exists(dirPath) then
@@ -81,25 +88,37 @@ local function downloadFile(path)
     shell.execute('wget -fg '..fullUrl..' /programs/'..GIT.REPO.."/"..path)
 end
 
+--------Start of main process--------
 
---the data for the json api for the repository
-local dat = getHTTPData(GIT.REPO_URL.."?recursive=1")
-
-local args, _ = shell.parse(...)
+local args, ops = shell.parse(...)
 local new = false
 local oldVer = {}
 
---To reinstall a program
-if args[1] == "new" then
-    new = true
-    if exists("/programs/"..GIT.REPO.."/") then
-        shell.execute("rm -r /programs/"..GIT.REPO.."/")
-    end
-    shell.execute("mkdir /programs/"..GIT.REPO.."/")
-elseif args[1] == "help" then
-    print("usage:\n\tUpdate [param]\nparams:\n\t[none]\t- Updates or creates files\n\tnew\t- Clean Reinstall")
+if ops.b then
+    GIT.BRANCH = ops.b
+end
+
+
+if args[1] == "help" then
+    print(  
+            "usage:\n"..
+            "    Update [param] [--b=branchName]\n"..
+            "\n"..
+            "params:\n"..
+            "    [none]    - Updates or creates files\n"..
+            "    new       - Clean Reinstall\n"..
+            "\n"..
+            "options:\n"..
+            "    --b       - Branch (default: master)"
+        )
     os.exit()
-else
+
+--Set new to true if new
+elseif args[1] == "new" then 
+    new = true
+
+--Update normally, check previous SHAs to new
+else 
     local oldFile = io.open('sha')
     if oldFile == nil then 
         oldVer = {} 
@@ -109,14 +128,34 @@ else
     end
 end
 
+if oldVer.branch ~= GIT.BRANCH then new = true end
+
+--To reinstall a program or force new if installing different branch
+if new then
+    if exists("/programs/"..GIT.REPO.."/") then
+        shell.execute("rm -r /programs/"..GIT.REPO.."/")
+    end
+    shell.execute("mkdir /programs/"..GIT.REPO.."/")
+end
+
+--the data for the json api for the repository
+local dat = getHTTPData(GIT.REPO_URL..GIT.BRANCH.."?recursive=1")
+if dat == nil then
+    os.exit(1)
+end
+
 --Download a file from each blob in the tree
 local ver = {}
+ver.branch = GIT.BRANCH
 local updates = 0
 
 for _, file in pairs(dat.tree) do
     if file.type == "blob" then
         ver[file.path] = file.sha
         if new or ver[file.path] ~= oldVer[file.path] then
+            if updates == 0 then
+                print("Fetching "..GIT.BRANCH.." branch from "..GIT.NAME.."/"..GIT.REPO)
+            end
             updates = updates + 1
             downloadFile(file.path)
         end
