@@ -157,5 +157,5 @@ local file = io.open('/programs/'..GIT.REPO..'/sha','w')
 file:write(json.encode(ver))
 file:close()
 
-print("Fetched "..ver.branch.." branch from "..GIT.NAME.."/"..GIT.REPO.."\n")
-print("\nUpdated "..updates.." file(s).")
+print("\nFetched "..ver.branch.." branch from "..GIT.NAME.."/"..GIT.REPO.."")
+print("Updated "..updates.." file(s).")
