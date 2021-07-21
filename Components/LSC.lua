@@ -11,7 +11,7 @@ local Functions = require("Util\\Functions")
 local GtMachine = require("Components\\GtMachine")
 
 -------------------------------------------------------------------------
-local LSC       = GtMachine:new("1cc48397-5b2c-4b14-adba-d6df1b8111be")
+local LSC       = GtMachine:new(LSC_A)
 -------------------------------------------------------------------------
 LSC.data      = {
                 isOn        = nil,

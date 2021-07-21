@@ -1,10 +1,11 @@
 --[[
-Date: 2021/06/05 
+Date: 2021/07/19
 Author: A. Jones & S. Huezo
-Version: 3.0
+Version: 1.0
 Usage: Main Runtime. To be used in conjunction with Components, Pages, and Utils.
 ]]--
-package.loaded["Pages\\MachineMonitor"] = nil          --Free memory
+package.loaded["Config.lua"]            = nil          --Free memory
+package.loaded["Pages\\MachineMonitor"] = nil
 package.loaded["Util\\Functions"]       = nil
 package.loaded["Util\\Graphic"]         = nil
 package.loaded["Components\\GtMachine"] = nil
@@ -12,6 +13,7 @@ package.loaded["Components\\Reactor"]   = nil
 package.loaded["Components\\LSC"]       = nil
 package.loaded["Components\\Turbine"]   = nil
 
+local Config    = require("Config")
 ------------General Libraries------------
 local event     = require("event")
 local keyboard  = require("keyboard")
@@ -35,14 +37,10 @@ local EBF       = GtMachine:new("c3440dd2-ba1e-4ea9-abfd-7a63e85d3ad2")
 local TFFT      = GtMachine:new("80e4e927-0901-465c-aafd-122c2373fb19")
 local threads   = {}
 local timers    = {}
-------------Variables---------------
-local title = "MONITORING SYSTEM"
-local quickBoot = false --setting this value to true disables splashscreen and gpu buffer
-
 ---------Update Functions---------
 
 local function dataUpdate()
-    Graphic.updatePowerData()
+    MachineMonitor.updatePowerData()
     
     LSC.updateData()
     Reactor.updateData()

@@ -1,10 +1,11 @@
 --[[
 Date: 2021/06/05 
 Author: A. Jones & S. Huezo
-Version: 1.0
+Version: 3.0
 Usage: A general page, to be used in conjunction with Main.lua
 ]]--
 local MachineMonitor = {}
+local Config    = require("Config")
 ------------General Libraries------------
 local event     = require("event")
 local keyboard  = require("keyboard")
@@ -21,9 +22,9 @@ local Reactor   = require("Components\\Reactor")
 local Turbine   = require("Components\\Turbine")
 local GtMachine = require("Components\\GtMachine")
 ------------Initilized Values------------
-local Cleanroom = GtMachine:new("49e22d69-9915-43af-95e4-12385c4d6867")
-local EBF       = GtMachine:new("c3440dd2-ba1e-4ea9-abfd-7a63e85d3ad2")
-local TFFT      = GtMachine:new("80e4e927-0901-465c-aafd-122c2373fb19")
+local Cleanroom = GtMachine:new(CLEANROOM_A)
+local EBF       = GtMachine:new(EBF_A)
+local TFFT      = GtMachine:new(TFFT_A)
 
 local threads   = {}
 local timers    = {}
@@ -31,21 +32,6 @@ local bat, fuel
 
 ------------Variables------------
 local title = "MONITORING SYSTEM"
-local quickBoot = false --setting this value to true disables splashscreen and gpu buffer
-
----------Update Functions---------
-function MachineMonitor.mainUpdate()
-    Graphic.drawStatusTile('Cleanroom', 'Status:', Cleanroom.data, 4, 3)
-    Graphic.drawStatusTile('Turbine', string.format('%d%%', Turbine.data.durability), Turbine.data, 17, 3)
-    Graphic.drawStatusTile('LSC', 'Status:', LSC.data, 30, 3)
-    Graphic.drawStatusTile('TFFT', 'Status:', TFFT.data, 43, 3)
-    Graphic.drawStatusTile('EBF', EBF:craftingStatus(), EBF.data, 4, 7)
-end --end MainUpdate
-
-function MachineMonitor.updateBars()
-    Graphic.updatePowerBar(LSC.data.Pcharge, 3, H-1, W-5, COLOR.green, COLOR.red) --draw powerbar
-    Graphic.updateReactorBar(Reactor.data.fuel, "Fuel", W-2, 5, H-8, COLOR.blue, COLOR.purple)
-end --end updateBars
 
 ------------Reactor Functions------------
 function MachineMonitor.updatePowerData()
@@ -135,10 +121,24 @@ function MachineMonitor.updateReactorBar(level, label, x, y, barHeight, fillColo
     gpu.setBackground(COLOR.black)
 end --end UpdateReactorBar
 
+---------Update Functions---------
+function MachineMonitor.mainUpdate()
+    Graphic.drawStatusTile('Cleanroom', 'Status:', Cleanroom.data, 4, 3)
+    Graphic.drawStatusTile('Turbine', string.format('%d%%', Turbine.data.durability), Turbine.data, 17, 3)
+    Graphic.drawStatusTile('LSC', 'Status:', LSC.data, 30, 3)
+    Graphic.drawStatusTile('TFFT', 'Status:', TFFT.data, 43, 3)
+    Graphic.drawStatusTile('EBF', EBF:craftingStatus(), EBF.data, 4, 7)
+end --end MainUpdate
+
+function MachineMonitor.updateBars()
+    Graphic.updatePowerBar(LSC.data.Pcharge, 3, H-1, W-5, COLOR.green, COLOR.red) --draw powerbar
+    Graphic.updateReactorBar(Reactor.data.fuel, "Fuel", W-2, 5, H-8, COLOR.blue, COLOR.purple)
+end --end updateBars
+
 ----------------Main----------------
 function MachineMonitor.startupFunction()
     Graphic.clearScreen()
-    Graphic.drawTitle(title) --draw title bar
+    Graphic.drawTitle("Monitoring System") --draw title bar
     Graphic.drawBox(COLOR.darkGrey,1,H-2,W,H) --draw background for power bars
     Graphic.drawExit(W, 1) --draw exit button
     threads = Functions.createThreads(mainUpdate,
@@ -148,7 +148,7 @@ end --end startupFunction
 Graphic.setupResolution() --initial screen setup (hardware)
 Graphic.clearScreen()
 
-if quickBoot == false then --provides override for buffer allocation and splashscreen
+if QUICKBOOT == false then --provides override for buffer allocation and splashscreen
     Graphic.SplashScreen("Initializing...", "Please Wait")
     local buf = gpu.allocateBuffer(W,H)
     gpu.setActiveBuffer(buf)

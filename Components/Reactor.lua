@@ -4,6 +4,7 @@ Author: A. Jones & S. Huezo
 Version: 1.0
 Usage: To be used in conjunction with Monitor.lua
 ]]--
+local Config    = require("Config")
 ------------Variables------------
 local component = require("component")
 local math      = require("math")
@@ -12,15 +13,13 @@ local GtMachine = require("Components\\GtMachine")
 local LSC       = require("Components\\LSC")
 
 -------------------------------------------------------------------------
-local Reactor   = component.proxy("5ca155e9-ba43-4b65-8ba7-2b76d2e8b458")
-local chest     = component.proxy("fa458337-2bdd-4161-94f1-c126ce8571ef")
-local redstone  = component.proxy("ac6e4538-fea3-44e0-ac6d-9820e915bc7e")
+local Reactor   = component.proxy(REACTOR_A)
+local chest     = component.proxy(REACTOR_INV)
+local redstone  = component.proxy(REDSTONE_REACTOR)
 -------------------------------------------------------------------------
 
 local NUM_RODS              = 14 --total number of fuel rods across all reactors in setup
 local NUM_REACTORS          = 2 -- total number of reactors chained together simultaneaously outputing the same EU
-local ON_THRESHOLD          = 0.80 --enter as a decimal value
-local OFF_THRESHOLD         = 0.99
 
 Reactor.data  = {
                 isOn        = nil,
@@ -75,9 +74,12 @@ end --end checkOutput
 
 ------- Energy Reserves -------
 function Reactor.checkFuelRem() --returns a value between 1 in 100 representing fuel remaining in reactor
-    local a = ( 100 - chest.getStackInSlot(2,21)["damage"] ) * NUM_RODS --get durability of fuel in reactor (durability of 1 rod, multiplies by num of rods)
-    local b = chest.getStackInSlot(4,4)["size"] * 100 --get amount of fuel rods in buffer
-    local c = chest.getStackInSlot(4,3)["size"] * 100 --get amount of spent fuel rods
+    local a = chest.getStackInSlot(2,21)["damage"] --get durability of fuel in reactor (durability of 1 rod, multiplies by num of rods)
+    local b = chest.getStackInSlot(4,4)["size"] --get amount of fuel rods in buffer
+    local c = chest.getStackInSlot(4,3)["size"] --get amount of spent fuel rods
+    if a ~= nil then a = 100 - a * NUM_RODS else return "Empty" end
+    if b ~= nil then b = b * 100 else return "Empty" end
+    if c ~= nil then c = c * 100 else return "Empty" end
     return  (a + b) / (NUM_RODS + b + c)
 end --end checkFuelRem
 
