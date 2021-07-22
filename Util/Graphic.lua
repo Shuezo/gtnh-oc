@@ -97,6 +97,19 @@ function Graphic.drawExit(x,y)
     gpu.setForeground(fg)
 end --end drawExit
 
+function Graphic.drawArrow(x, y, left)
+    local bg = gpu.setBackground(COLOR.grey)
+    local fg = gpu.setForeground(COLOR.white)
+    if left == true then
+        gpu.fill(x,y,2,1,"<")
+    else
+        gpu.fill(x,y,2,1,">")
+    end
+
+    gpu.setBackground(bg)
+    gpu.setForeground(fg)
+end --end drawArrow
+
 function Graphic.drawStatusTile(lineOne, lineTwo, machine, x, y)
     Graphic.drawBox(COLOR.darkGrey, x, y, x+10, y+2)
     gpu.setBackground(COLOR.darkGrey)

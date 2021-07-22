@@ -30,9 +30,6 @@ local threads   = {}
 local timers    = {}
 local bat, fuel
 
-------------Variables------------
-local title = "MONITORING SYSTEM"
-
 ------------Reactor Functions------------
 function MachineMonitor.updatePowerData()
     local dataLSC      = LSC.data
@@ -138,7 +135,7 @@ end --end updateBars
 ----------------Main----------------
 function MachineMonitor.startupFunction()
     Graphic.clearScreen()
-    Graphic.drawTitle("Monitoring System") --draw title bar
+    Graphic.drawTitle("MACHINE MONITORING SYSTEM") --draw title bar
     Graphic.drawBox(COLOR.darkGrey,1,H-2,W,H) --draw background for power bars
     Graphic.drawExit(W, 1) --draw exit button
     threads = Functions.createThreads(mainUpdate,

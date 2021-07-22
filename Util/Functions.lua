@@ -36,7 +36,6 @@ function Functions.getPercent(val, precision) --create a percent at a certain pr
     return string.format("%".. precision .. "f%%", val * 100)
 end --end getPercent
 
-
 function Functions.getHTTPData(url) --gets HTTP data and returns it in a table
     local dat = ""
     local req, resp = pcall(internet.request, url)

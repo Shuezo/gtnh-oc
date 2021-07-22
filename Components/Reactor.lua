@@ -77,9 +77,9 @@ function Reactor.checkFuelRem() --returns a value between 1 in 100 representing 
     local a = chest.getStackInSlot(2,21)["damage"] --get durability of fuel in reactor (durability of 1 rod, multiplies by num of rods)
     local b = chest.getStackInSlot(4,4)["size"] --get amount of fuel rods in buffer
     local c = chest.getStackInSlot(4,3)["size"] --get amount of spent fuel rods
-    if a ~= nil then a = 100 - a * NUM_RODS else return "Empty" end
-    if b ~= nil then b = b * 100 else return "Empty" end
-    if c ~= nil then c = c * 100 else return "Empty" end
+    if a ~= nil then a = 100 - a * NUM_RODS else return 0 end
+    if b ~= nil then b = b * 100 else return 0 end
+    if c ~= nil then c = c * 100 else return 0 end
     return  (a + b) / (NUM_RODS + b + c)
 end --end checkFuelRem
 
