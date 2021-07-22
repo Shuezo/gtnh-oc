@@ -5,6 +5,11 @@ Version: 2.0
 Usage: Storage of generic functions and basic constants.
 ]]--
 local Functions = {}
+
+local computer  = require("computer")
+local internet = require("internet")
+local json = require("json")
+
 ------------Constants------------
 COLOR = { blue      = 0x4286F4,
           darkAqua  = 0x3392FF,
@@ -65,34 +70,25 @@ end --end errorlog
 
 ------------Thread/Timer Functions------------
 local thread    = require("thread")
+local event     = require("event")
 
-function Functions.createThreadTimer(...)
+--Create a thread for use with a timer
+local function createThread(updateFunc)
+    local thr = thread.create(function ()
+        local syc, e
+        while true do
+            syc, e = xpcall(updateFunc, debug.traceback)
 
-end
-
-local function createThreads(...)
-    local threads = {}
-    
-    for i,updateFunc in ipairs({...}) do
-        threads[updateFunc] = thread.create(function ()
-            local syc, e
-            while true do
-                if syc == false then
-                    syc, e = xpcall(updateFunc, debug.traceback)
-                    Functions.errorLog(e)
-                    thread.current():kill()
-                end
+            if syc == false then
+                Functions.errorLog(e)
+                thread.current():kill()
             end
-        end)
-    end
 
-    return threads
-end
+            thread.current():suspend()
+        end
+    end)
 
-function Functions.killThreads(tbl)
-    for key, thr in pairs(tbl) do
-        thr:kill()
-    end
+    return thr
 end
 
 local function resume(thr)
@@ -109,26 +105,27 @@ function Functions.stopTimers(tbl)
     end
 end
 
---[[
-    Functions.startTimers(args)
-    args: threadTable, {updateFunc, Time)}, ...
-]]--
-function Functions.startTimers(...)
-    local timers = {}
-    local thr = {}
+function Functions.killThreads(tbl)
+    for key, thr in pairs(tbl) do
+        thr:kill()
+    end
+end
 
-    for i,v in ipairs({...}) do
-        if i == 1 then --Thread table
-            thr = v
-        else
-            local func = v[1]
-            local t = v[2]
-            
-            timers[func] = event.timer(t, resume(thr[func]), math.huge)
-        end
+--Creates timers with threads
+--args: {updateFunc, Time}, ...
+function Functions.addTimers(...)
+    local threads = {}
+    local timers = {}
+
+    for i,val in ipairs({...}) do
+        local func = val[1]
+        local interval = val[2]
+
+        threads[func] = createThread(func)
+        timers[func] = event.timer(interval, resume(threads[func]), math.huge)
     end
 
-    return timers
+    return timers, threads
 end
 
 return Functions
