@@ -25,32 +25,22 @@ local GtMachine = require("Components\\GtMachine")
 local TFFT      = GtMachine:new(TFFT_A)
 
 ----------------Main----------------
-function FluidMonitor.startupFunction()
+function FluidMonitor.startup()
     Graphic.clearScreen()
     Graphic.drawTitle("FLUID MONITORING SYSTEM") --draw title bar
     Graphic.drawBox(COLOR.darkGrey,1,H-2,W,H) --draw background for power bars
     Graphic.drawExit(W, 1) --draw exit button
-    threads = Functions.createThreads(mainUpdate,
-                                      updateBars)
+    threads = Functions.createThreads(FluidMonitor.mainUpdate)
 end --end startupFunction
 
 Graphic.setupResolution() --initial screen setup (hardware)
 Graphic.clearScreen()
+startup()
 
-if QUICKBOOT == false then --provides override for buffer allocation and splashscreen
-    Graphic.SplashScreen("Initializing...", "Please Wait")
-    local buf = gpu.allocateBuffer(W,H)
-    gpu.setActiveBuffer(buf)
-    
-    startupFunction()
-    os.sleep(0.25)
-    thread.waitForAll(threads)
-    
-    gpu.bitblt(0, 1, 1, W, H, buf, 1, 1) --load buffer onto screen
-    gpu.freeBuffer(buf)
-else
-    startupFunction()
+function FluidMonitor.mainUpdate()
+    print( TFFT.getSensorInformation() )
 end
+
 
 startTimers()
 
