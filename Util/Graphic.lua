@@ -12,10 +12,6 @@ local string    = require("string")
 local gpu       = component.gpu
 ------------Util Libraries------------
 local Functions = require("Util\\Functions")
-------------Compenent Libraries------------
-local GtMachine = require("Components\\GtMachine")
-local Reactor   = require("Components\\Reactor")
-local LSC       = require("Components\\LSC")
 
 ------------Administrative Functions------------
 function Graphic.clearScreen() --clears the screen

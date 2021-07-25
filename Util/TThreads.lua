@@ -8,7 +8,7 @@ Usage: Set up objects containing timers that resume threads
 ]]--
 
 local TThreads = {}
-local Functions = require("Functions")
+local Functions = require("Util\\Functions")
 
 
 ------------Thread/Timer Functions------------

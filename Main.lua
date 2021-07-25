@@ -8,10 +8,12 @@ package.loaded["Config.lua"]            = nil          --Free memory
 package.loaded["Pages\\MachineMonitor"] = nil
 package.loaded["Util\\Functions"]       = nil
 package.loaded["Util\\Graphic"]         = nil
+package.loaded["Util\\TThreads"]        = nil
 package.loaded["Components\\GtMachine"] = nil
 package.loaded["Components\\Reactor"]   = nil
 package.loaded["Components\\LSC"]       = nil
 package.loaded["Components\\Turbine"]   = nil
+
 
 local Config    = require("Config")
 ------------General Libraries------------
