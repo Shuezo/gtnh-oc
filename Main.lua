@@ -96,7 +96,7 @@ end
 
 timers.page:stop() -- Stop timers/threads of current page
 Reactor.off()
-Functions.clearScreen()
+Graphic.clearScreen()
 
 --clean up globals
 W, H, COLOR = nil, nil, nil
