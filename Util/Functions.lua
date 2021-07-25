@@ -60,11 +60,13 @@ end --end getHTTPdata
 
 ------------Error Functions------------
 function Functions.errorLog(error) --parses the current time from a web API, and writes a new file under the "Log" folder with the timestamp as the name
+        print("Error Detected!")
         local dat = Functions.getHTTPdata("http://worldtimeapi.org/timezone/America/New_York") --get current time
-        local filename = "..Log\\" .. json.decode(dat).datetime .. ".txt" --filepath .. timestamp .. file extension
+        local filename = "/C:/programs/gtnh-oc/Log/" .. json.decode(dat).datetime .. ".txt" --filepath .. timestamp .. file extension
         local file = io.open(filename, 'w') -- open file with write privileges
         file:write(error) --write error
         file:close() --close file
+        print("Error successfully written to disk! Check the Log Folder")
         computer.beep(250,10) --indicate a thread had an error by making a sound
 end --end errorlog
 
