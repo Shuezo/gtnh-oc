@@ -14,6 +14,7 @@ local Functions = require("Util\\Functions")
 ------------Thread/Timer Functions------------
 local thread    = require("thread")
 local event     = require("event")
+local computer  = require("computer")
 
 --Create a thread for use with a timer
 local function createThread(updateFunc)
@@ -23,7 +24,11 @@ local function createThread(updateFunc)
             syc, e = xpcall(updateFunc, debug.traceback)
 
             if syc == false then
-                Functions.errorLog(e)
+                --Functions.errorLog(e) --doesn't work
+                local file = io.open("lastError.lua", 'w') -- open file with write privileges
+                file:write(e) --write error
+                file:close() --close file
+                computer.beep(250,10) --indicate a thread had an error by making a sound
                 thread.current():kill()
             end
 

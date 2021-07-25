@@ -24,14 +24,13 @@ local Turbine   = require("Components\\Turbine")
 local GtMachine = require("Components\\GtMachine")
 ------------Initilized Values------------
 local TFFT      = GtMachine:new(Config.TFFT_A)
-
 local timers = {}
 
 ----------------Main----------------
 
 local function mainUpdate()
-    for i, v in pairs(TFFT.getSensorInformation()) do
-        if i>1 and i<23 then
+    for i, v in ipairs(TFFT.getSensorInformation()) do
+        if i>1 and i<26 then
             gpu.set(1, i, v)
         end
     end
