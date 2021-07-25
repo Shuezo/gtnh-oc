@@ -98,13 +98,18 @@ while true do --loop until x is touched
             break
         elseif x == W then
             timers.page:stop()
-
             if pageNumber+1 > #Pages  then
                 pageNumber = 1
             else
                 pageNumber = pageNumber + 1
             end
-
+        elseif X == 1 then
+            timers.page:stop()
+            if pageNumber-1 == 0  then
+                pageNumber = #Pages
+            else
+                pageNumber = pageNumber - 1
+            end
             timers.page = Pages[pageNumber].startup()
         end
     end

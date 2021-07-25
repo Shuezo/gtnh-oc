@@ -24,11 +24,11 @@ local function createThread(updateFunc)
             syc, e = xpcall(updateFunc, debug.traceback)
 
             if syc == false then
-                --Functions.errorLog(e) --doesn't work
-                local file = io.open("lastError.log", 'w') -- open file with write privileges
-                file:write(e) --write error
-                file:close() --close file
-                computer.beep(250,10) --indicate a thread had an error by making a sound
+                Functions.errorLog(e) --doesn't work
+                --local file = io.open("lastError.log", 'w') -- open file with write privileges
+                --file:write(e) --write error
+                --file:close() --close file
+                --computer.beep(250,10) --indicate a thread had an error by making a sound
                 thread.current():kill()
             end
 
