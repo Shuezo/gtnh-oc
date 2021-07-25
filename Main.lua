@@ -6,6 +6,7 @@ Usage: Main Runtime. To be used in conjunction with Components, Pages, and Utils
 ]]--
 package.loaded["Config.lua"]            = nil          --Free memory
 package.loaded["Pages\\MachineMonitor"] = nil
+package.loaded["Pages\\FluidMonitor"]   = nil
 package.loaded["Util\\Functions"]       = nil
 package.loaded["Util\\Graphic"]         = nil
 package.loaded["Util\\TThreads"]        = nil
@@ -33,7 +34,10 @@ local Reactor   = require("Components\\Reactor")
 local Turbine   = require("Components\\Turbine")
 local GtMachine = require("Components\\GtMachine")
 ------------Page Libraries------------
-local MachineMonitor = require("Pages\\MachineMonitor")
+local Pages =   {
+                  require("Pages\\MachineMonitor"), --1
+                  require("Pages\\FluidMonitor")    --2
+                }
 ------------Initilized Values------------
 local Cleanroom = GtMachine:new("49e22d69-9915-43af-95e4-12385c4d6867")
 local EBF       = GtMachine:new("c3440dd2-ba1e-4ea9-abfd-7a63e85d3ad2")
@@ -58,6 +62,8 @@ local function controlPower()
 end
 
 ----------------Setup----------------
+local pageNumber = 1
+
 Graphic.setupResolution()
 
 if Config.QUICKBOOT == false then --provides override for buffer allocation and splashscreen
@@ -69,7 +75,7 @@ if Config.QUICKBOOT == false then --provides override for buffer allocation and 
                                      {calcData,     0.5 },
                                      {controlPower, 2   })
     
-    timers.page = MachineMonitor.startup()
+    timers.page = Pages[pageNumber].startup()
     os.sleep(0.25)
     thread.waitForAll(timers.page.threads)
     thread.waitForAll(timers.main.threads)
@@ -77,7 +83,7 @@ if Config.QUICKBOOT == false then --provides override for buffer allocation and 
     gpu.bitblt(0, 1, 1, W, H, buf, 1, 1) --load buffer onto screen
     gpu.freeBuffer(buf)
 else
-    timers.page = MachineMonitor.startup()
+    timers.page = Pages[pageNumber].startup()
 end
 
 
@@ -90,6 +96,16 @@ while true do --loop until x is touched
     elseif id == "touch" then       --exit button
         if x == W and y == 1 then
             break
+        elseif x == W then
+            timers.page:stop()
+
+            if pageNumber+1 > #Pages  then
+                pageNumber = 1
+            else
+                pageNumber = pageNumber + 1
+            end
+
+            timers.page = Pages[pageNumber].startup()
         end
     end
 end
