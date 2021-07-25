@@ -11,11 +11,12 @@ local math      = require("math")
 local Functions = require("Util\\Functions")
 local GtMachine = require("Components\\GtMachine")
 local LSC       = require("Components\\LSC")
+local Config    = require("Config")
 
 -------------------------------------------------------------------------
-local Reactor   = component.proxy(REACTOR_A)
-local chest     = component.proxy(REACTOR_INV)
-local redstone  = component.proxy(REDSTONE_REACTOR)
+local Reactor   = component.proxy(Config.REACTOR_A)
+local chest     = component.proxy(Config.REACTOR_INV)
+local redstone  = component.proxy(Config.REDSTONE_REACTOR)
 -------------------------------------------------------------------------
 
 local NUM_RODS              = 14 --total number of fuel rods across all reactors in setup
