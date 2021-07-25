@@ -61,7 +61,7 @@ function MachineMonitor.updatePowerData()
     gpu.setBackground(COLOR.black)
 end --end updateData
 
-function MachineMonitor.updatePowerBar(level, x, y, barWidth, fillColor, emptyColor) --Value to calculate bar fill and set label, Hor Bar Position, Vertical Bar Position, Width of bar, colors
+local function updatePowerBar(level, x, y, barWidth, fillColor, emptyColor) --Value to calculate bar fill and set label, Hor Bar Position, Vertical Bar Position, Width of bar, colors
     local percent = Functions.getPercent(level)
     local textX = Functions.centerText((x + barWidth)/2, percent)
     local fillWidth = math.ceil(barWidth * level)
@@ -92,7 +92,7 @@ function MachineMonitor.updatePowerBar(level, x, y, barWidth, fillColor, emptyCo
     gpu.setBackground(COLOR.black)
 end --end UpdatePowerBar
 
-function MachineMonitor.updateReactorBar(level, label, x, y, barHeight, fillColor, emptyColor) --Value to calculate bar fill, label, Hor Bar Position, Vertical Bar Position, Width of bar, colors
+local function updateReactorBar(level, label, x, y, barHeight, fillColor, emptyColor) --Value to calculate bar fill, label, Hor Bar Position, Vertical Bar Position, Width of bar, colors
     local percent = Functions.getPercent(level, "3.0")
     local textPos = x-4, y-2
     local fillHeight = math.ceil(barHeight * level)
@@ -137,8 +137,8 @@ local function mainUpdate()
 end --end MainUpdate
 
 local function updateBars()
-    Graphic.updatePowerBar(LSC.data.Pcharge, 3, H-1, W-5, COLOR.green, COLOR.red) --draw powerbar
-    Graphic.updateReactorBar(Reactor.data.fuel, "Fuel", W-2, 5, H-8, COLOR.blue, COLOR.purple)
+    updatePowerBar(LSC.data.Pcharge, 3, H-1, W-5, COLOR.green, COLOR.red) --draw powerbar
+    updateReactorBar(Reactor.data.fuel, "Fuel", W-2, 5, H-8, COLOR.blue, COLOR.purple)
 end --end updateBars
 
 ----------------Main----------------
