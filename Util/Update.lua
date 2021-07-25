@@ -30,8 +30,9 @@ local function getHTTPData(url) --gets HTTP data and returns it in a table
     local req, resp = pcall(internet.request, url)
     
     if req then
+        while resp.response() == nil do os.sleep(0.1) end
         local code, _, _ = resp.response()
-
+        
         if code == 200 then
             local tmp = resp()
             while tmp ~= nil do -- Add response buffer to dat
