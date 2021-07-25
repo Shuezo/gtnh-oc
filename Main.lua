@@ -58,6 +58,8 @@ local function controlPower()
 end
 
 ----------------Setup----------------
+Graphic.setupResolution()
+
 if Config.QUICKBOOT == false then --provides override for buffer allocation and splashscreen
     Graphic.SplashScreen("Initializing...", "Please Wait")
     local buf = gpu.allocateBuffer(W,H)
