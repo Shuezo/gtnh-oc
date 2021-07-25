@@ -22,7 +22,9 @@ local Reactor   = require("Components\\Reactor")
 local Turbine   = require("Components\\Turbine")
 local GtMachine = require("Components\\GtMachine")
 ------------Initilized Values------------
-local TFFT      = GtMachine:new(TFFT_A)
+local TFFT      = GtMachine:new(Config.TFFT_A)
+
+local threads = {}
 
 ----------------Main----------------
 function FluidMonitor.startup()
@@ -33,15 +35,8 @@ function FluidMonitor.startup()
     threads = Functions.createThreads(FluidMonitor.mainUpdate)
 end --end startupFunction
 
-Graphic.setupResolution() --initial screen setup (hardware)
-Graphic.clearScreen()
-startup()
-
 function FluidMonitor.mainUpdate()
     print( TFFT.getSensorInformation() )
 end
-
-
-startTimers()
 
 return FluidMonitor

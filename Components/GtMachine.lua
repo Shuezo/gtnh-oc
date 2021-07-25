@@ -6,6 +6,7 @@ Usage: Handles general parsing of the component API from gregtech machines
 ]]--
 ------------Variables------------
 local GtMachine = {}
+local machines = {}
 
 local component = require("component")
 local math      = require("math")
@@ -13,16 +14,21 @@ local string    = require("string")
 local Functions = require("Util\\Functions")
 
 function GtMachine:new(addr)
-    
-    local o = component.proxy(addr)
-    o.data = {
-                isOn = nil,
-                output = 0,
-                problems = nil,
-             }
-             
-    setmetatable(o, self)
-    self.__index = self
+    local o = machines[addr] 
+
+    if not o then --Check if machine object exists
+        o = component.proxy(addr)
+        o.data = {
+                    isOn = nil,
+                    output = 0,
+                    problems = nil,
+                }
+                
+        setmetatable(o, self)
+        self.__index = self
+
+        machines[addr] = o
+    end
 
     return o
 end

@@ -4,6 +4,7 @@ Author: A. Jones & S. Huezo
 Version: 3.0
 Usage: A general page, to be used in conjunction with Main.lua
 ]]--
+
 local MachineMonitor = {}
 local Config    = require("Config")
 ------------General Libraries------------
@@ -16,18 +17,18 @@ local gpu       = component.gpu
 ------------Util Libraries------------
 local Functions = require("Util\\Functions")
 local Graphic   = require("Util\\Graphic")
+local TThreads  = require("Util\\TThreads")
 ------------Compenent Libraries------------
 local LSC       = require("Components\\LSC")
 local Reactor   = require("Components\\Reactor")
 local Turbine   = require("Components\\Turbine")
 local GtMachine = require("Components\\GtMachine")
 ------------Initilized Values------------
-local Cleanroom = GtMachine:new(CLEANROOM_A)
-local EBF       = GtMachine:new(EBF_A)
-local TFFT      = GtMachine:new(TFFT_A)
+local Cleanroom = GtMachine:new(Config.CLEANROOM_A)
+local EBF       = GtMachine:new(Config.EBF_A)
+local TFFT      = GtMachine:new(Config.TFFT_A)
 
-local threads   = {}
-local timers    = {}
+local timers   = {}
 local bat, fuel
 
 ------------Reactor Functions------------
@@ -119,7 +120,15 @@ function MachineMonitor.updateReactorBar(level, label, x, y, barHeight, fillColo
 end --end UpdateReactorBar
 
 ---------Update Functions---------
-function MachineMonitor.mainUpdate()
+local function dataUpdate()
+    MachineMonitor.updatePowerData()
+    
+    Cleanroom:updateData()
+    EBF:updateData()
+    TFFT:updateData()
+end --end dataUpdate
+
+local function mainUpdate()
     Graphic.drawStatusTile('Cleanroom', 'Status:', Cleanroom.data, 4, 3)
     Graphic.drawStatusTile('Turbine', string.format('%d%%', Turbine.data.durability), Turbine.data, 17, 3)
     Graphic.drawStatusTile('LSC', 'Status:', LSC.data, 30, 3)
@@ -127,39 +136,21 @@ function MachineMonitor.mainUpdate()
     Graphic.drawStatusTile('EBF', EBF:craftingStatus(), EBF.data, 4, 7)
 end --end MainUpdate
 
-function MachineMonitor.updateBars()
+local function updateBars()
     Graphic.updatePowerBar(LSC.data.Pcharge, 3, H-1, W-5, COLOR.green, COLOR.red) --draw powerbar
     Graphic.updateReactorBar(Reactor.data.fuel, "Fuel", W-2, 5, H-8, COLOR.blue, COLOR.purple)
 end --end updateBars
 
 ----------------Main----------------
-function MachineMonitor.startupFunction()
+function MachineMonitor.startup()
     Graphic.clearScreen()
     Graphic.drawTitle("MACHINE MONITORING SYSTEM") --draw title bar
     Graphic.drawBox(COLOR.darkGrey,1,H-2,W,H) --draw background for power bars
     Graphic.drawExit(W, 1) --draw exit button
-    threads = Functions.createThreads(mainUpdate,
-                                      updateBars)
-end --end startupFunction
-
-Graphic.setupResolution() --initial screen setup (hardware)
-Graphic.clearScreen()
-
-if QUICKBOOT == false then --provides override for buffer allocation and splashscreen
-    Graphic.SplashScreen("Initializing...", "Please Wait")
-    local buf = gpu.allocateBuffer(W,H)
-    gpu.setActiveBuffer(buf)
-    
-    startupFunction()
-    os.sleep(0.25)
-    thread.waitForAll(threads)
-    
-    gpu.bitblt(0, 1, 1, W, H, buf, 1, 1) --load buffer onto screen
-    gpu.freeBuffer(buf)
-else
-    startupFunction()
-end
-
-startTimers()
+    timers = TThreads:newTimers({dataUpdate, 4},
+                                {mainUpdate, 1},
+                                {updateBars, 0.5})
+    return timers
+end --end startup
 
 return MachineMonitor

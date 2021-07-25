@@ -24,6 +24,7 @@ local gpu       = component.gpu
 ------------Util Libraries------------
 local Functions = require("Util\\Functions")
 local Graphic   = require("Util\\Graphic")
+local TThreads  = require("Util\\TThreads")
 ------------Component Libraries------------
 local LSC       = require("Components\\LSC")
 local Reactor   = require("Components\\Reactor")
@@ -35,19 +36,14 @@ local MachineMonitor = require("Pages\\MachineMonitor")
 local Cleanroom = GtMachine:new("49e22d69-9915-43af-95e4-12385c4d6867")
 local EBF       = GtMachine:new("c3440dd2-ba1e-4ea9-abfd-7a63e85d3ad2")
 local TFFT      = GtMachine:new("80e4e927-0901-465c-aafd-122c2373fb19")
-local threads   = {}
-local timers    = {}
+
+local timers    = {main = nil, page = nil}
 ---------Update Functions---------
 
 local function dataUpdate()
-    MachineMonitor.updatePowerData()
-    
     LSC.updateData()
     Reactor.updateData()
     Turbine.updateData()
-    Cleanroom:updateData()
-    EBF:updateData()
-    TFFT:updateData()
 end --end dataUpdate
 
 local function calcData()
@@ -56,33 +52,45 @@ end --end calcData
 
 local function controlPower()
     Reactor.switch()
+    Turbine.switch()
+end
+
+----------------Setup----------------
+if Config.QUICKBOOT == false then --provides override for buffer allocation and splashscreen
+    Graphic.SplashScreen("Initializing...", "Please Wait")
+    local buf = gpu.allocateBuffer(W,H)
+    gpu.setActiveBuffer(buf)
+
+    timers.main = TThreads:newTimers({dataUpdate,   4   },
+                                     {calcData,     0.5 },
+                                     {controlPower, 2   })
+    
+    timers.page = MachineMonitor.startup()
+    os.sleep(0.25)
+    thread.waitForAll(timers.page.threads)
+    thread.waitForAll(timers.main.threads)
+    
+    gpu.bitblt(0, 1, 1, W, H, buf, 1, 1) --load buffer onto screen
+    gpu.freeBuffer(buf)
+else
+    timers.page = MachineMonitor.startup()
 end
 
 
-----------interrupt threads----------
-
-threads["touch"] = thread.create(function ()
-    local id, x, y
-    while true do --loop until x is touched
-        id, _, x, y = event.pullMultiple("touch", "interrupted")
-        if id == "interrupted" then
+--------------MAIN LOOP--------------
+local id, x, y
+while true do --loop until x is touched
+    id, _, x, y = event.pullMultiple("touch", "interrupted")
+    if id == "interrupted" then
+        break
+    elseif id == "touch" then       --exit button
+        if x == W and y == 1 then
             break
-        elseif id == "touch" then       --exit button
-            if x == W and y == 1 then
-                break
-            end
         end
     end
-end)
+end
 
--- end main function. Wait until user exits in touch thread
-thread.waitForAny({threads["touch"]})
-
------Exit-----
-
-Functions.stopTimers(timers)
-Functions.killThreads(threads)
-
+timers.page:stop() -- Stop timers/threads of current page
 Reactor.off()
 Functions.clearScreen()
 
