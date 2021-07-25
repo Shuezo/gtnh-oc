@@ -20,7 +20,7 @@ REACTOR_INV         = "fa458337-2bdd-4161-94f1-c126ce8571ef",
 LSC_A               = "1cc48397-5b2c-4b14-adba-d6df1b8111be",
 LG_GAS_TURBINE_A    = "cc5ead40-5cd1-4df9-966a-671b41e20d38",
 REDSTONE_REACTOR    = "ac6e4538-fea3-44e0-ac6d-9820e915bc7e",
-REDSTONE_TURBINE    = "cc5ead40-5cd1-4df9-966a-671b41e20d38",
+REDSTONE_TURBINE    = "cd5f5cfe-81e6-4ef6-b3bd-955ccb08f48a",
 
 }
 return config

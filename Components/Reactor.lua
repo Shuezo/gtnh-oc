@@ -55,9 +55,9 @@ function Reactor.off() -- turns reactor off via redstone
 end --end off
 
 function Reactor.switch() -- turns on and off the reactor depending on stored charge levels
-    if not Reactor.data.isOn and LSC.data.Pcharge < Config.ON_THRESHOLD then
+    if not Reactor.data.isOn and LSC.data.Pcharge < Config.REACTOR_ON_THRESHOLD then
         Reactor.on()
-    elseif Reactor.data.isOn and LSC.data.Pcharge >= Config.OFF_THRESHOLD then
+    elseif Reactor.data.isOn and LSC.data.Pcharge >= Config.REACTOR_OFF_THRESHOLD then
         Reactor.off()
     end
 end --end switch
