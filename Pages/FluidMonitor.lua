@@ -32,7 +32,7 @@ local function splitTable(dat)
     local fluidAmount = {}
     for k,v in ipairs(dat) do
         if k>1 and k<=26 then
-            local _, _, name, amount = v:find("^%d+ %- f?l?u?i?d?%p?([. %d%a]+): (%d+)")
+            local _, _, name, amount = v:find("^%d+ %- f?l?u?i?d?%p?([. _%d%a]+): (%d+)")
             table.insert(fluidName, name)
             table.insert(fluidAmount, amount)
         end
@@ -43,7 +43,7 @@ end
 local function drawData(t, x, y)
     local z = y
     for k,v in ipairs(t) do
-        if k>1 and k<=13 then
+        if k>=1 and k<=13 then
             gpu.set(x, y, v)
             y = y + 2
         elseif k>13 and k<=26 then
