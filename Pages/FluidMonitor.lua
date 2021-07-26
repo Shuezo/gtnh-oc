@@ -32,7 +32,7 @@ local function splitTable(dat)
     local fluidAmount = {}
     for k,v in ipairs(dat) do
         if k>1 and k<=26 then
-            local _, _, name, amount = v:find("^%d+ %- f?l?u?i?d?%p?([. %a]+): (%d+)")
+            local _, _, name, amount = v:find("^%d+ %- f?l?u?i?d?%p?([. %d%a]+): (%d+)")
             table.insert(fluidName, name)
             table.insert(fluidAmount, amount)
         end
