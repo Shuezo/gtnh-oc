@@ -103,7 +103,8 @@ while true do --loop until x is touched
             else
                 pageNumber = pageNumber + 1
             end
-        timers.page = Pages[pageNumber].startup()
+            timers.page = Pages[pageNumber].startup()
+
         elseif x == 1 then
             timers.page:stop()
             if pageNumber-1 == 0  then
@@ -111,12 +112,14 @@ while true do --loop until x is touched
             else
                 pageNumber = pageNumber - 1
             end
-        timers.page = Pages[pageNumber].startup()
+            timers.page = Pages[pageNumber].startup()
+
         end
     end
 end
 
 timers.page:stop() -- Stop timers/threads of current page
+timers.main:stop() -- Stop main timers
 Reactor.off()
 Graphic.clearScreen()
 
