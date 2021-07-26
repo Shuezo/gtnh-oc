@@ -25,30 +25,23 @@ local GtMachine = require("Components\\GtMachine")
 ------------Initilized Values------------
 local TFFT      = GtMachine:new(Config.TFFT_A)
 local timers = {}
-local dat = {}
-local fluidName = {}
-local fluidAmount = {}
 ----------------Main----------------
 
-local function splitTable()
-    fluidName = {}
-    fluidAmount = {}
+local function splitTable(dat)
+    local fluidName = {}
+    local fluidAmount = {}
     for k,v in ipairs(dat) do
         if k>1 and k<=26 then
-            table.insert(fluidName, string.sub(v, (string.find(v,'-') + 2), (string.find(v,':') - 1) ) )
-        end
-    end
-
-    for k,v in ipairs(dat) do
-        if k>1 and k<=26 then
-            table.insert(fluidAmount, string.sub(v, (string.find(v, ':') + 2), (string.find(v, 'L') - 4) ) )
+            local _, _, name, amount = dat:find("^%d+ %- ?fluid%.?[%a+%p]([. %a]+): (%d+)")
+            table.insert(fluidName, name)
+            table.insert(fluidAmount, amount)
         end
     end
 return fluidName, fluidAmount
 end
 
 local function drawData(t, x, y)
-    z = y
+    local z = y
     for k,v in ipairs(t) do
         if k>1 and k<=13 then
             gpu.set(x, y, v)
@@ -62,8 +55,8 @@ local function drawData(t, x, y)
 end
 
 local function mainUpdate()
-    dat = TFFT.getSensorInformation()
-    splitTable()
+    local dat = TFFT.getSensorInformation()
+    local fluidName, fluidAmount = splitTable(dat)
     drawData(fluidName,2,2)
     drawData(fluidAmount,2,3)
 end
