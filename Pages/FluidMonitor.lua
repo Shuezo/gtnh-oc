@@ -26,55 +26,47 @@ local GtMachine = require("Components\\GtMachine")
 local TFFT      = GtMachine:new(Config.TFFT_A)
 local timers = {}
 local dat = {}
-
+local fluidName = {}
+local fluidAmount = {}
 ----------------Main----------------
 
 local function splitTable()
-    local fluidName = {}
-    local fluidAmount = {}
-    
+    fluidName = {}
+    fluidAmount = {}
     for k,v in ipairs(dat) do
         if k>1 and k<=26 then
-            s, e = string.find(':')
-            table.insert(fluidName, string.sub(5,s) )
+            table.insert(fluidName, string.sub(v, (string.find(v,'-') + 2), (string.find(v,':') - 1) ) )
         end
     end
 
     for k,v in ipairs(dat) do
         if k>1 and k<=26 then
-            table.insert(fluidAmount, string.sub(string.find(':'), string.find('L') ) )
+            table.insert(fluidAmount, string.sub(v, (string.find(v, ':') + 2), (string.find(v, 'L') - 4) ) )
         end
     end
+return fluidName, fluidAmount
+end
 
+local function drawData(t, x, y)
+    z = y
+    for k,v in ipairs(t) do
+        if k>1 and k<=13 then
+            gpu.set(x, y, v)
+            y = y + 2
+        elseif k>13 and k<=26 then
+            x = W/2
+            gpu.set(x, z, v)
+            z = z + 2
+        end
+    end
 end
 
 local function mainUpdate()
     dat = TFFT.getSensorInformation()
     splitTable()
-    for i,v in ipairs(fluidName) do
-        if i==4 then
-            gpu.set(1, 25, v)
-        elseif i>1 and i<=13 and i~=4 then
-            gpu.set(1,i,v)
-        elseif i>13 and i<=26 then
-            gpu.set(20,i-13,v)
-        end
-    end
+    drawData(fluidName,2,2)
+    drawData(fluidAmount,2,3)
 end
-
---[[
-local function mainUpdate()
-    for i,v in ipairs(dat) do
-        if i==4 then
-            gpu.set(1, 25, v)
-        elseif i>1 and i<=13 and i~=4 then
-            gpu.set(1,i,v)
-        elseif i>13 and i<=26 then
-            gpu.set(20,i-13,v)
-        end
-    end
-end
-]]--
 
 function FluidMonitor.startup()
     Graphic.clearScreen()
