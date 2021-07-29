@@ -59,18 +59,12 @@ function Functions.getHTTPData(url) --gets HTTP data and returns it in a table
 end --end getHTTPdata
 
 ------------Error Functions------------
-function Functions.touchDir(dir)
-    local status = os.rename(dir, dir)
-    if status == nil then shell.execute("touch "..dir) end
-    return status ~= nil
-end
-
 function Functions.errorLog(error) --parses the current time from a web API, and writes a new file under the "Log" folder with the timestamp as the name
         print("Error Detected!")
         local dat = Functions.getHTTPData("https://worldtimeapi.org/api/timezone/America/New_York") --get current time
         local filename = string.gsub("/programs/gtnh-oc/Log/Err_" .. dat.datetime .. ".txt", ":","_") --filepath .. timestamp .. file extension
-        Functions.touchDir("/programs/gtnh-oc/Log")
         local f = io.open(filename, 'w') -- open file with write privileges
+        shell.execute("mkdir /programs/gtnh-oc/Log/") --if it doesn't exist
         f:write(error) --write error
         f:close() --close file
         print("Error successfully written to disk! Check the Log Folder")
