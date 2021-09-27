@@ -142,7 +142,7 @@ local function mainUpdate() --Draws tiles onscreen and handles refreshing
     Graphic.drawStatusTile('EBF', EBF:craftingStatus(), EBF.data, 4, 7)
     Graphic.drawStatusTile('OVEN A', "Status:", OVEN_1.data, 17, 7)
     Graphic.drawStatusTile('OVEN B', "Status:", OVEN_2.data, 30, 7)
-    Graphic.drawStatusTile('D-TOWER', "Status:", DISTOWER.data, 43, 7)
+    Graphic.drawStatusTile('D-TOWER', DISTOWER:craftingStatus(), DISTOWER.data, 43, 7)
 end --end MainUpdate
 
 local function updateBars()
