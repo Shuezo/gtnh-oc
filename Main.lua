@@ -46,7 +46,7 @@ local TFFT      = GtMachine:new("80e4e927-0901-465c-aafd-122c2373fb19")
 local timers    = {main = nil, page = nil}
 ---------Update Functions---------
 
-local function dataUpdate()
+local function dataUpdate() --core data refreshing, runs regardless of GUI status
     LSC.updateData()
     Reactor.updateData()
     Turbine.updateData()

@@ -1,10 +1,9 @@
 --[[
 Date: 2021/06/05 
 Author: A. Jones & S. Huezo
-Version: 3.0
+Version: 3.1
 Usage: A general page, to be used in conjunction with Main.lua
 ]]--
-
 local MachineMonitor = {}
 local Config    = require("Config")
 ------------General Libraries------------
@@ -27,9 +26,13 @@ local GtMachine = require("Components\\GtMachine")
 local Cleanroom = GtMachine:new(Config.CLEANROOM_A)
 local EBF       = GtMachine:new(Config.EBF_A)
 local TFFT      = GtMachine:new(Config.TFFT_A)
+local OVEN_1    = GtMachine:new(Config.OVEN_A)
+local OVEN_2    = GtMachine:new(Config.OVEN_B)
+local DISTOWER  = GtMachine:new(Config.DIST_TOWER_A)
 
 local timers   = {}
 local bat, fuel
+local Oven_Group_Benzene = false
 
 ------------Reactor Functions------------
 function MachineMonitor.updatePowerData()
@@ -120,20 +123,26 @@ local function updateReactorBar(level, label, x, y, barHeight, fillColor, emptyC
 end --end UpdateReactorBar
 
 ---------Update Functions---------
-local function dataUpdate()
+local function dataUpdate() --handles data refreshing for non-essential tasks on machine monitor screen. (to be disabled when screen is cached)
     MachineMonitor.updatePowerData()
     
     Cleanroom:updateData()
     EBF:updateData()
     TFFT:updateData()
+    OVEN_1:updateData()
+    OVEN_2:updateData()
+    DISTOWER:updateData()
 end --end dataUpdate
 
-local function mainUpdate()
+local function mainUpdate() --Draws tiles onscreen and handles refreshing
     Graphic.drawStatusTile('Cleanroom', 'Status:', Cleanroom.data, 4, 3)
     Graphic.drawStatusTile('Turbine', string.format('%d%%', Turbine.data.durability), Turbine.data, 17, 3)
     Graphic.drawStatusTile('LSC', 'Status:', LSC.data, 30, 3)
     Graphic.drawStatusTile('TFFT', 'Status:', TFFT.data, 43, 3)
     Graphic.drawStatusTile('EBF', EBF:craftingStatus(), EBF.data, 4, 7)
+    Graphic.drawStatusTile('OVEN A', "Status:", OVEN_1.data, 17, 7)
+    Graphic.drawStatusTile('OVEN B', "Status:", OVEN_2.data, 30, 7)
+    Graphic.drawStatusTile('D-TOWER', "Status:", DISTOWER.data, 43, 7)
 end --end MainUpdate
 
 local function updateBars()
