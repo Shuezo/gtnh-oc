@@ -40,11 +40,12 @@ function GtMachine:updateData()
 end
 
 function GtMachine:hasProblems()
-    if string.sub( self.getSensorInformation()[5], 13, 14 ) == 'c0' then return false                       --Cleanroom, EBF
-    elseif self.getSensorInformation()[2] == '§aNo Maintenance issues§r' then return false                  --Turbine
-    elseif string.sub( self.getSensorInformation()[7], 13, 14 ) == 'c0' then return false                       --Pyrolyse Oven
-    elseif self.getSensorInformation()[9] == 'Maintenance Status: §aWorking perfectly§r' then return false  --LSC
-    elseif self.getSensorInformation()[31] == 'Maintenance Status: §aWorking perfectly§r' then return false --TFFT
+    if  string.sub( self.getSensorInformation()[5], 13, 14 ) == 'c0'                        --Cleanroom, EBF
+    or  self.getSensorInformation()[2] == '§aNo Maintenance issues§r'                       --Turbine
+    or  string.sub( self.getSensorInformation()[7], 13, 14 ) == 'c0'                        --Pyrolyse Oven
+    or  self.getSensorInformation()[9] == 'Maintenance Status: §aWorking perfectly§r'       --LSC
+    or  self.getSensorInformation()[31] == 'Maintenance Status: §aWorking perfectly§r'      --tfft
+    then return false
     else return true
     end
 end --end hasProblems
