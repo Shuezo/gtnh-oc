@@ -39,9 +39,9 @@ local Pages =   {
                   require("Pages\\FluidMonitor")    --2
                 }
 ------------Initilized Values------------
-local Cleanroom = GtMachine:new("49e22d69-9915-43af-95e4-12385c4d6867")
-local EBF       = GtMachine:new("c3440dd2-ba1e-4ea9-abfd-7a63e85d3ad2")
-local TFFT      = GtMachine:new("80e4e927-0901-465c-aafd-122c2373fb19")
+local Cleanroom = GtMachine:new(Config.CLEANROOM_A)
+local EBF       = GtMachine:new(Config.EBF_A)
+local TFFT      = GtMachine:new(Config.TFFT_A)
 
 local timers    = {main = nil, page = nil}
 ---------Update Functions---------
