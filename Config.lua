@@ -12,7 +12,7 @@ TURBINE_SAFETY_THRESHOLD    = 1,     --
 
 ------------Adapter Addresses------------
 CLEANROOM_A         = "49e22d69-9915-43af-95e4-12385c4d6867",
-EBF_A               = "c3440dd2-ba1e-4ea9-abfd-7a63e85d3ad2",
+EBF_A               = "1297a7ad-884e-4f80-858d-661e2d93e20f",
 TFFT_A              = "80e4e927-0901-465c-aafd-122c2373fb19",
 REACTOR_A           = "5ca155e9-ba43-4b65-8ba7-2b76d2e8b458",
 REACTOR_B           = "fea9b540-29d6-4032-8b70-bafcf6f8b795",
