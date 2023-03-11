@@ -87,10 +87,10 @@ while true do --loop until x is touched
     id, _, x, y = event.pullMultiple("touch", "interrupted")
     if id == "interrupted" then
         break
-    elseif id == "touch" then       --exit button
-        if x == W and y == 1 then
+    elseif id == "touch" then       
+        if x == W and y == 1 then -- Exit Btn
             break
-        elseif x == W then
+        elseif x == W then        -- Next Page
             timers.page:stop()
             if pageNumber+1 > #Pages  then
                 pageNumber = 1
@@ -99,7 +99,7 @@ while true do --loop until x is touched
             end
             timers.page = Pages[pageNumber].startup()
 
-        elseif x == 1 then
+        elseif x == 1 then        -- Prev Page
             timers.page:stop()
             if pageNumber-1 == 0  then
                 pageNumber = #Pages
@@ -111,10 +111,11 @@ while true do --loop until x is touched
         end
     end
 end
-
+Graphic.clearScreen()
+print("Stopping threads...")
 timers.page:stop() -- Stop timers/threads of current page
 timers.main:stop() -- Stop main timers
-Graphic.clearScreen()
+print("exited successfully")
 
 --clean up globals
 W, H, COLOR = nil, nil, nil
