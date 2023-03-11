@@ -14,7 +14,7 @@ local string    = require("string")
 local Functions = require("Util\\Functions")
 
 function GtMachine:new(addr)
-    local o = machines[addr] 
+    local o = machines[addr]
 
     if not o then --If machine object doesn't exist, create it
         o = component.proxy(addr)

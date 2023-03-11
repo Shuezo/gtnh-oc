@@ -20,7 +20,6 @@ local Graphic   = require("Util\\Graphic")
 local TThreads  = require("Util\\TThreads")
 ------------Compenent Libraries------------
 local LSC       = require("Components\\LSC")
-local Turbine   = require("Components\\Turbine")
 local GtMachine = require("Components\\GtMachine")
 
 ------------Power Functions------------
