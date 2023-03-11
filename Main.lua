@@ -1,7 +1,7 @@
 --[[
 Date: 2021/07/19
 Author: A. Jones & S. Huezo
-Version: 1.0
+Version: 1.1
 Usage: Main Runtime. To be used in conjunction with Components, Pages, and Utils.
 ]]--
 package.loaded["Config.lua"]            = nil          --Free memory
