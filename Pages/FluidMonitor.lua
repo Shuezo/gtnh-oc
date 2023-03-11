@@ -19,8 +19,6 @@ local Graphic   = require("Util\\Graphic")
 local TThreads  = require("Util\\TThreads")
 ------------Compenent Libraries------------
 local LSC       = require("Components\\LSC")
-local Reactor   = require("Components\\Reactor")
-local Turbine   = require("Components\\Turbine")
 local GtMachine = require("Components\\GtMachine")
 ------------Initilized Values------------
 local TFFT      = GtMachine:new(Config.TFFT_A)

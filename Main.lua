@@ -11,9 +11,7 @@ package.loaded["Util\\Functions"]       = nil
 package.loaded["Util\\Graphic"]         = nil
 package.loaded["Util\\TThreads"]        = nil
 package.loaded["Components\\GtMachine"] = nil
-package.loaded["Components\\Reactor"]   = nil
 package.loaded["Components\\LSC"]       = nil
-package.loaded["Components\\Turbine"]   = nil
 
 
 local Config    = require("Config")
@@ -30,13 +28,11 @@ local Graphic   = require("Util\\Graphic")
 local TThreads  = require("Util\\TThreads")
 ------------Component Libraries------------
 local LSC       = require("Components\\LSC")
-local Reactor   = require("Components\\Reactor")
-local Turbine   = require("Components\\Turbine")
 local GtMachine = require("Components\\GtMachine")
 ------------Page Libraries------------
 local Pages =   {
                   require("Pages\\MachineMonitor"), --1
-                  require("Pages\\FluidMonitor")    --2
+                  --require("Pages\\FluidMonitor")    --2
                 }
 ------------Initilized Values------------
 local Cleanroom = GtMachine:new(Config.CLEANROOM_A)
@@ -54,10 +50,10 @@ local function calcData()
     LSC.calcData()
 end --end calcData
 
-local function controlPower()
-    Reactor.switch()
-    Turbine.switch()
-end
+--local function controlPower()
+--    Reactor.switch()
+--    Turbine.switch()
+--end
 
 ----------------Setup----------------
 local pageNumber = 1
@@ -118,7 +114,6 @@ end
 
 timers.page:stop() -- Stop timers/threads of current page
 timers.main:stop() -- Stop main timers
-Reactor.off()
 Graphic.clearScreen()
 
 --clean up globals
