@@ -9,9 +9,10 @@ local component = require("component")
 local math      = require("math")
 local Functions = require("Util\\Functions")
 local GtMachine = require("Components\\GtMachine")
+local Config    = require("Config")
 
 -------------------------------------------------------------------------
-local LSC       = GtMachine:new("1cc48397-5b2c-4b14-adba-d6df1b8111be")
+local LSC       = GtMachine:new(Config.LSC_A)
 -------------------------------------------------------------------------
 LSC.data      = {
                 isOn        = nil,

@@ -2,10 +2,11 @@
 Date: 2021/06/22 
 Author: A. Jones & S. Huezo
 Version: 1.0
-Usage: To be used in conjunction with Monitor.lua
+Usage: Handles general parsing of the component API from gregtech machines
 ]]--
 ------------Variables------------
 local GtMachine = {}
+local machines = {}
 
 local component = require("component")
 local math      = require("math")
@@ -13,15 +14,21 @@ local string    = require("string")
 local Functions = require("Util\\Functions")
 
 function GtMachine:new(addr)
-    local o = component.proxy(addr) or {}
-    o.data = {
-                isOn = nil,
-                output = 0,
-                problems = nil,
-             }
-             
-    setmetatable(o, self)
-    self.__index = self
+    local o = machines[addr] 
+
+    if not o then --Check if machine object exists
+        o = component.proxy(addr)
+        o.data = {
+                    isOn = nil,
+                    output = 0,
+                    problems = nil,
+                }
+                
+        setmetatable(o, self)
+        self.__index = self
+
+        machines[addr] = o
+    end
 
     return o
 end
@@ -33,10 +40,11 @@ function GtMachine:updateData()
 end
 
 function GtMachine:hasProblems()
-    if string.sub( self.getSensorInformation()[5], 13, 14 ) == 'c0' then return false                       --Cleanroom, EBF
-    elseif self.getSensorInformation()[2] == '§aNo Maintenance issues§r' then return false                  --Turbine
-    elseif self.getSensorInformation()[9] == 'Maintenance Status: §aWorking perfectly§r' then return false  --LSC
-    elseif self.getSensorInformation()[31] == 'Maintenance Status: §aWorking perfectly§r' then return false --TFFT
+    if self.getSensorInformation()[5] and string.sub( self.getSensorInformation()[5], 13, 14 ) == 'c0' then return false       --Cleanroom, EBF
+    elseif self.getSensorInformation()[7] and string.sub( self.getSensorInformation()[7], 13, 14 ) == 'c0' then return false   --Pyrolyse Oven
+    elseif self.getSensorInformation()[2] == '§aNo Maintenance issues§r' then return false                                     --Turbine
+    elseif self.getSensorInformation()[9] == 'Maintenance Status: §aWorking perfectly§r' then return false                     --LSC
+    elseif self.getSensorInformation()[31] == 'Maintenance Status: §aWorking perfectly§r' then return false                    --tfft
     else return true
     end
 end --end hasProblems
