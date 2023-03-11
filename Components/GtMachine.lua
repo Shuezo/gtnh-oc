@@ -16,18 +16,22 @@ local Functions = require("Util\\Functions")
 function GtMachine:new(addr)
     local o = machines[addr] 
 
-    if not o then --Check if machine object exists
+    if not o then --If machine object doesn't exist, create it
         o = component.proxy(addr)
-        o.data = {
-                    isOn = nil,
-                    output = 0,
-                    problems = nil,
-                }
-                
-        setmetatable(o, self)
-        self.__index = self
+        if o then --If adapter at given address exists
+            o.data = {
+                        isOn = nil,
+                        output = 0,
+                        problems = nil,
+                    }
+                    
+            setmetatable(o, self)
+            self.__index = self
 
-        machines[addr] = o
+            machines[addr] = o
+        else
+            o = {}
+        end
     end
 
     return o

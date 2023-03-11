@@ -47,9 +47,7 @@ local timers    = {main = nil, page = nil}
 ---------Update Functions---------
 
 local function dataUpdate() --core data refreshing, runs regardless of GUI status
-    LSC.updateData()
-    Reactor.updateData()
-    Turbine.updateData()
+    --updateData functions
 end --end dataUpdate
 
 local function calcData()
@@ -71,9 +69,9 @@ if Config.QUICKBOOT == false then --provides override for buffer allocation and 
     local buf = gpu.allocateBuffer(W,H)
     gpu.setActiveBuffer(buf)
 
+    --create a timer for update events in a specific second delay
     timers.main = TThreads:newTimers({dataUpdate,   4   },
-                                     {calcData,     0.5 },
-                                     {controlPower, 2   })
+                                     {calcData,     0.5 })
     
     timers.page = Pages[pageNumber].startup()
     os.sleep(0.25)

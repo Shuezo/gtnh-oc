@@ -15,7 +15,7 @@ local Config    = require("Config")
 local LSC       = GtMachine:new(Config.LSC_A)
 -------------------------------------------------------------------------
 LSC.data      = {
-                isOn        = nil,
+                isOn        = false,
                 input       = 0,
                 output      = 0,
                 charge      = 0,
@@ -23,17 +23,19 @@ LSC.data      = {
                 capacity    = 0,
                 ref         = {0,0},   -- 1st is current, 2nd is also current (unless changed)
                 time        = "",
-                problems    = nil,
+                problems    = true,
                 }
 
 function LSC.updateData()
-    LSC.data.isOn           = LSC.isMachineActive()
-    LSC.data.charge         = LSC.getEUStored()
-    LSC.data.capacity       = LSC.getEUMaxStored()
-    LSC.data.input          = LSC.getEUInputAverage()
-    LSC.data.output         = LSC.getEUOutputAverage()
-    LSC.data.Pcharge        = LSC.data.charge / LSC.data.capacity
-    LSC.data.problems       = LSC:hasProblems()
+    if LSC.isMachineActive~=nil then --check if adapter can access GtMachine functions
+        LSC.data.isOn           = LSC.isMachineActive()
+        LSC.data.charge         = LSC.getEUStored()
+        LSC.data.capacity       = LSC.getEUMaxStored()
+        LSC.data.input          = LSC.getEUInputAverage()
+        LSC.data.output         = LSC.getEUOutputAverage()
+        LSC.data.Pcharge        = LSC.data.charge / LSC.data.capacity
+        LSC.data.problems       = LSC:hasProblems()
+    end
 end --end updateData
 
 function LSC.calcData() --manipulates battery data from battery buffer
